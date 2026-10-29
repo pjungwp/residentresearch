@@ -28,7 +28,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
         {items.map((t) => (
           <div
             key={t.id}
-            className="pointer-events-auto flex items-center gap-2 rounded-xl bg-primary px-4 py-3 text-[14px] font-medium text-white shadow-lg"
+            className="pointer-events-auto flex items-center gap-2 rounded-xl bg-primary px-4 py-3 text-[1rem] font-medium text-white shadow-lg"
           >
             {t.tone === 'ok' ? <CheckCircle2 size={18} aria-hidden /> : <AlertTriangle size={18} aria-hidden />}
             {t.text}

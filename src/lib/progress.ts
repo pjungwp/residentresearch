@@ -26,28 +26,18 @@ export function weekRequirements(p: Project, week: number): Req[] {
   const reqs: Req[] = fieldsForWeek(p, week)
     .filter((f) => f.required)
     .map((f) => ({ id: f.key, label: f.label, done: !!fv(p, f.key).trim() }));
-  if (week === 1) {
-    const storyDone = ['story.believed', 'story.wondered', 'story.propose', 'story.anticipate', 'story.change'].filter((k) => fv(p, k).trim()).length >= 4;
-    reqs.unshift({ id: 'story', label: 'Once upon a time story', done: storyDone });
-  }
   if (week === 2) {
     const included = p.sources.filter((s) => s.include);
     const verified = included.filter((s) => s.verification.status === 'verified' || s.verification.status === 'partial');
-    reqs.unshift(
-      { id: 'searchLog', label: 'Search log (at least 2 searches)', done: p.lists.searchLog.length >= 2 },
-      { id: 'sources', label: 'At least 3 relevant sources included', done: included.length >= 3 },
-      { id: 'verified', label: 'All included sources verified', done: included.length > 0 && verified.length === included.length },
-      { id: 'annotated', label: 'All included sources annotated', done: included.length > 0 && included.every((s) => s.annotation.findings.trim() && s.annotation.limitations.trim()) },
-      { id: 'recheck', label: 'Recheck pass run', done: included.length > 0 && included.every((s) => !!s.verification.recheckedAt) }
-    );
+    reqs.push({ id: 'sources', label: '3+ verified key sources', done: verified.length >= 3 });
   }
-  if (week === 4) {
+  if (week === 6) {
     reqs.push(
       { id: 'milestones', label: 'Timeline dates set', done: p.lists.milestones.filter((m) => m.date).length >= 3 },
-      { id: 'risks', label: 'Top risks with fallbacks', done: p.lists.risks.length >= 1 },
-      { id: 'dissemination', label: 'Dissemination target', done: p.lists.dissemination.length >= 1 }
+      { id: 'risks', label: 'Top risks + fallbacks', done: p.lists.risks.length >= 1 }
     );
   }
+  if (week === 7) reqs.push({ id: 'dissemination', label: 'Dissemination target', done: p.lists.dissemination.length >= 1 });
   for (const c of WEEKS[week - 1].checklist) reqs.push({ id: c.id, label: c.text, done: !!p.checks[c.id] });
   return reqs;
 }
@@ -104,7 +94,7 @@ export function weekStatus(p: Project, week: number): WeekStatus {
 export const WEEK_STATUS_LABEL: Record<WeekStatus, string> = {
   not_started: 'Not started',
   in_progress: 'In progress',
-  ready: 'Ready for mentor review',
+  ready: 'Ready for review',
   revision: 'Revision requested',
   completed: 'Completed'
 };

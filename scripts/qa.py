@@ -1,12 +1,12 @@
 """
-Responsive + flow QA for Research Forge (local; mocks the Claude API and citation services).
+Responsive + flow QA for ResearchForge (local; mocks the Claude API and citation services).
 
     npm run build && npx vite preview --port 4174
     python3 scripts/qa.py http://localhost:4174 screenshots
 
 Requires Python Playwright with Chromium.
 """
-import asyncio, json, sys
+import asyncio, json, re, sys
 from pathlib import Path
 from playwright.async_api import async_playwright
 
@@ -58,104 +58,131 @@ async def mock(ctx):
 async def overflow(page):
     return await page.evaluate("() => document.documentElement.scrollWidth - window.innerWidth")
 
-async def seed(page):
-    """Create a project with some content via the UI."""
-    await page.goto(BASE + "/projects")
-    await page.fill("input[placeholder='e.g. Postpartum BP follow-up']", "Postpartum BP follow-up")
-    await page.get_by_role("button", name="Open my Research Studio").click()
-    await page.wait_for_url("**/p/**")
+async def culprits(page):
+    return await page.evaluate("""() => [...document.querySelectorAll('body *')].filter(e => e.getBoundingClientRect().right > window.innerWidth + 1).slice(0,4).map(e => e.tagName + '.' + String(e.className).slice(0,50))""")
+
+async def new_project(page, title="Postpartum BP follow-up"):
+    await page.goto(BASE + "/concierge")
+    await page.fill("input[placeholder='e.g. Postpartum BP follow-up']", title)
+    await page.get_by_role("button", name="Start designing").click()
+    await page.wait_for_url("**/stage/1")
     return page.url.split("/p/")[1].split("/")[0]
 
 async def main():
     async with async_playwright() as pw:
         b = await pw.chromium.launch()
-        # ---- Flow at desktop
-        ctx = await b.new_context(viewport={"width": 1440, "height": 900})
+        ctx = await b.new_context(viewport={"width": 1440, "height": 900}, accept_downloads=True)
         await mock(ctx)
         page = await ctx.new_page()
         errs = []
         page.on("pageerror", lambda e: errs.append(str(e)))
-        pid = await seed(page)
-        # Studio: prefill from start mode, send
-        await page.fill("#composer", "I want to study postpartum BP follow-up after discharge.")
-        await page.get_by_role("button", name="Send").click()
-        await page.get_by_role("button", name="I understand").click()
+        page.on("console", lambda m: errs.append(m.text[:200]) if m.type == "error" and "React Router caught" in m.text else None)
+
+        # ---- Academy: slides, check, assignment, submit
+        await page.goto(BASE + "/academy/week/1")
+        for _ in range(6):
+            await page.get_by_role("button", name="Next slide").click()
+        await page.get_by_role("button", name="In PGY-1s, does weekly feedback coaching").click()
+        await page.wait_for_selector("text=Correct.")
+        await page.screenshot(path=str(OUT / "1440_week1_check.png"))
+        await page.get_by_role("button", name="Present").click()
+        await page.wait_for_selector("[aria-label='Slides, full screen']")
+        await page.screenshot(path=str(OUT / "1440_present.png"))
+        await page.keyboard.press("Escape")
+        submit_btn = page.get_by_role("button", name="Submit assignment")
+        if not await submit_btn.is_disabled(): problems.append("[academy] submit enabled with empty required fields")
+        await page.fill("#a1-problem", "Students get few chances to practise hard conversations.")
+        await page.fill("#a1-gap", "Unclear whether AI-simulated patients improve observed skills.")
+        await page.fill("#a1-purpose", "Test AI-simulated encounters with rubric feedback.")
+        await page.fill("#a1-question", "In third-year students, do AI-simulated encounters improve OSCE communication scores vs usual teaching?")
+        await page.select_option("#a1-outcomeLevel", index=3)
+        await page.fill("#a1-finer\\.f", "Yes")
+        await submit_btn.click()
+        async with page.expect_download() as dl:
+            await page.get_by_role("button", name="Yes, submit").click()
+        d = await dl.value
+        await d.save_as(str(OUT / "week1.docx"))
+        await page.wait_for_selector("text=Edit & resubmit")
+        if not await page.get_by_role("link", name="Add faculty email").count(): problems.append("[academy] missing faculty email prompt")
+        await page.screenshot(path=str(OUT / "1440_submitted.png"))
+        # AI feedback (mocked, optional, paid credits)
+        await page.get_by_role("button", name="Get AI feedback").click()
+        await page.wait_for_selector("text=paid API credits")
+        await page.get_by_role("button", name="Use credits — get feedback").click()
+        await page.wait_for_selector("text=Good start")
+        # Bring into Concierge
+        await page.get_by_role("button", name="Bring into Concierge").click()
+        await page.wait_for_url("**/stage/2")
+        await page.wait_for_timeout(400)
+        if await page.get_by_text("Something went wrong").count(): problems.append("[crash] stage 2 after transfer")
+        q = await page.locator("#f-question textarea").input_value()
+        if "OSCE" not in q: problems.append("[transfer] question not copied into Concierge")
+        await page.screenshot(path=str(OUT / "1440_stage2.png"))
+        pid = page.url.split("/p/")[1].split("/")[0]
+
+        # ---- Concierge: stages, progressive disclosure, AI mentor
+        await page.goto(f"{BASE}/p/{pid}/stage/3")
+        await page.wait_for_selector("text=Choose a framework")
+        await page.get_by_role("button", name="More details").click()
+        await page.screenshot(path=str(OUT / "1440_stage3.png"))
+        await page.goto(f"{BASE}/p/{pid}/mentor")
+        await page.fill("#composer", "Help me define the outcome.")
         await page.get_by_role("button", name="Send").click()
         await page.wait_for_selector("text=Suggested Blueprint update")
-        await page.screenshot(path=str(OUT / "1440_studio_proposal.png"))
         await page.get_by_role("button", name="Accept", exact=True).click()
         await page.wait_for_selector("text=Accepted into Blueprint")
-        val = await page.evaluate("""async () => { return document.body.innerText.includes('Documented BP assessment within 10 days of discharge') }""")
-        if not val: problems.append("[flow] accepted proposal not visible in Blueprint panel")
-        # Add & verify AI-suggested DOI
-        await page.get_by_role("button", name="Add & verify 10.1097/gme.0000000000002028").click()
-        await page.wait_for_timeout(800)
-        # Week 1 editing
-        await page.goto(f"{BASE}/p/{pid}/week/1")
-        await page.get_by_role("textbox", name="Once upon a time, we believed").fill("Postpartum patients with hypertension get follow-up.")
-        await page.locator("#f-question textarea").fill("Among postpartum patients with HDP, does remote BP monitoring improve timely follow-up?")
-        await page.wait_for_timeout(700)
-        await page.screenshot(path=str(OUT / "1440_week1.png"))
-        # Evidence page shows verified source
-        await page.goto(f"{BASE}/p/{pid}/evidence")
-        await page.wait_for_selector("text=2022 hormone therapy position statement")
-        txt = await page.locator("main").inner_text()
-        if "Verified" not in txt: problems.append("[flow] source not verified in Evidence Library")
-        await page.locator("li[id^='s_'] button[aria-expanded]").first.click()
-        await page.screenshot(path=str(OUT / "1440_evidence.png"))
-        # Proposal
         await page.goto(f"{BASE}/p/{pid}/proposal")
-        await page.wait_for_selector("text=Proposal editor")
-        await page.screenshot(path=str(OUT / "1440_proposal.png"))
-        # DOCX export
         async with page.expect_download() as dl:
             await page.get_by_role("button", name="Protocol DOCX").click()
-        d = await dl.value
-        path = OUT / "protocol.docx"
-        await d.save_as(str(path))
-        if path.stat().st_size < 4000: problems.append("[flow] protocol docx too small")
-        # Mentor review
-        await page.goto(f"{BASE}/p/{pid}/review")
-        await page.get_by_role("radio", name="Mentor view").click()
-        await page.screenshot(path=str(OUT / "1440_review.png"))
-        await page.get_by_role("radio", name="Resident view").click()
-        # Persistence across reload
-        await page.goto(f"{BASE}/p/{pid}/week/1")
-        await page.reload()
-        v = await page.locator("#f-question textarea").input_value()
-        if "remote BP monitoring" not in v: problems.append("[flow] week 1 field not persisted across reload")
-        # Downstream flag check not tested here (time-based); unit tested.
-        if errs: problems.append(f"[pageerror] {errs[:3]}")
+        await (await dl.value).save_as(str(OUT / "protocol.docx"))
+
+        # ---- Week 5 combined proposal export
+        await page.goto(BASE + "/academy/week/5")
+        async with page.expect_download() as dl:
+            await page.get_by_role("button", name="Export full proposal (Word)").click()
+        await (await dl.value).save_as(str(OUT / "proposal.docx"))
+
+        # ---- Text size button
+        await page.goto(BASE + "/")
+        before = await page.evaluate("getComputedStyle(document.documentElement).fontSize")
+        await page.get_by_role("button", name=re.compile("Text size")).click()
+        after = await page.evaluate("getComputedStyle(document.documentElement).fontSize")
+        if before == after: problems.append(f"[text size] unchanged {before}")
+        await page.get_by_role("button", name=re.compile("Text size")).click()
+        await page.get_by_role("button", name=re.compile("Text size")).click()
+        await page.get_by_role("button", name=re.compile("Text size")).click()  # back to Large
+        if errs: problems.append(f"[pageerror flow] {errs[:3]}")
         await ctx.close()
 
-        # ---- Responsive sweep (reuse storage by seeding per context)
+        # ---- Responsive sweep
         for w, h in VIEWPORTS:
             ctx = await b.new_context(viewport={"width": w, "height": h})
             await mock(ctx)
             page = await ctx.new_page()
             errs = []
             page.on("pageerror", lambda e: errs.append(str(e)))
-            pid = await seed(page)
-            routes = ["/projects", f"/p/{pid}", f"/p/{pid}/week/1", f"/p/{pid}/week/2", f"/p/{pid}/week/4", f"/p/{pid}/blueprint", f"/p/{pid}/evidence", f"/p/{pid}/proposal", f"/p/{pid}/review", "/settings"]
+            pid = await new_project(page)
+            routes = ["/", "/academy", "/academy/week/1", "/academy/week/3", "/academy/week/5", "/concierge", "/settings",
+                      f"/p/{pid}/stage/1", f"/p/{pid}/stage/2", f"/p/{pid}/stage/4", f"/p/{pid}/stage/6", f"/p/{pid}/stage/7",
+                      f"/p/{pid}/mentor", f"/p/{pid}/blueprint", f"/p/{pid}/evidence", f"/p/{pid}/proposal", f"/p/{pid}/review"]
             for r in routes:
                 await page.goto(BASE + r, wait_until="networkidle")
-                await page.wait_for_timeout(150)
+                await page.wait_for_timeout(120)
+                if await page.get_by_text("Something went wrong").count(): problems.append(f"[crash] {w} {r}")
                 ov = await overflow(page)
-                if ov > 0:
-                    culprits = await page.evaluate("""() => [...document.querySelectorAll('body *')].filter(e => e.getBoundingClientRect().right > window.innerWidth + 1).slice(0,4).map(e => e.tagName + '.' + String(e.className).slice(0,50))""")
-                    problems.append(f"[overflow {ov}px] {w}x{h} {r} {culprits}")
-                if r in (f"/p/{pid}", f"/p/{pid}/week/2", f"/p/{pid}/blueprint"):
-                    await page.screenshot(path=str(OUT / f"{w}x{h}_{r.split('/')[-1] or 'studio'}.png"))
-            # composer visible in first viewport on Studio
-            await page.goto(f"{BASE}/p/{pid}")
-            box = await page.locator("#composer").bounding_box()
-            if not box or box["y"] + box["height"] > h:
-                problems.append(f"[viewport] composer not visible at {w}x{h}: {box}")
-            # dark mode screenshot at a couple sizes
+                if ov > 0: problems.append(f"[overflow {ov}px] {w}x{h} {r} {await culprits(page)}")
+                if r in ("/", "/academy/week/1", f"/p/{pid}/stage/2", f"/p/{pid}/mentor"):
+                    await page.screenshot(path=str(OUT / f"{w}x{h}_{r.strip('/').replace('/', '_') or 'home'}.png"))
+            # largest text size still fits
+            await page.evaluate("localStorage.setItem('rc.settings', JSON.stringify({...JSON.parse(localStorage.getItem('rc.settings')||'{}'), textSize:'xxl'}))")
+            for r in ["/", "/academy/week/2", f"/p/{pid}/stage/5"]:
+                await page.goto(BASE + r, wait_until="networkidle")
+                ov = await overflow(page)
+                if ov > 0: problems.append(f"[overflow xxl {ov}px] {w}x{h} {r} {await culprits(page)}")
             if w in (390, 1440):
                 await page.emulate_media(color_scheme="dark")
-                await page.wait_for_timeout(100)
-                await page.screenshot(path=str(OUT / f"{w}x{h}_studio_dark.png"))
+                await page.goto(BASE + "/academy/week/2", wait_until="networkidle")
+                await page.screenshot(path=str(OUT / f"{w}x{h}_dark_week2.png"))
             if errs: problems.append(f"[pageerror] {w}: {errs[:2]}")
             await ctx.close()
         await b.close()

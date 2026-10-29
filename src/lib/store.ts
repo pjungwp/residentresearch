@@ -243,6 +243,13 @@ export function useProjects(): ListState {
   return useSyncExternalStore(subscribe, getSnap, getSnap);
 }
 
+/** A structured copy of a cached project (loads the cache first if needed). */
+export async function getProjectCached(id: string): Promise<Project | undefined> {
+  if (!loaded) await loadAll();
+  const p = cache.get(id);
+  return p && !p.archived ? structuredClone(p) : undefined;
+}
+
 export async function persist(p: Project): Promise<void> {
   cache.set(p.id, p);
   emit();
@@ -356,8 +363,13 @@ export interface Settings {
   blueprintWidth: number;
   theme: 'system' | 'light' | 'dark';
   lastProjectId: string;
+  /** reading size: 100% / 112.5% / 125% / 137.5% */
+  textSize: 'md' | 'lg' | 'xl' | 'xxl';
+  /** where course assignments are sent */
+  facultyEmail: string;
+  learnerName: string;
 }
-const DEFAULT_SETTINGS: Settings = { accessCode: '', email: '', aiNoticeAccepted: false, role: 'resident', mentorName: '', railExpanded: false, blueprintWidth: 360, theme: 'system', lastProjectId: '' };
+const DEFAULT_SETTINGS: Settings = { accessCode: '', email: '', aiNoticeAccepted: false, role: 'resident', mentorName: '', railExpanded: false, blueprintWidth: 360, theme: 'system', lastProjectId: '', textSize: 'lg', facultyEmail: '', learnerName: '' };
 export function getSettings(): Settings {
   return { ...DEFAULT_SETTINGS, ...safe.get<Partial<Settings>>(SETTINGS_KEY, {}) };
 }

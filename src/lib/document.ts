@@ -67,8 +67,8 @@ const TEMPLATES: Template[] = [
   {
     id: 'background',
     title: 'Background and significance',
-    keys: ['problem', 'significance', 'gap'],
-    build: (p) => join(para(p, '', 'problem'), para(p, '', 'significance'), para(p, '', 'gap'))
+    keys: ['problem', 'significance', 'gap', 'purpose'],
+    build: (p) => join(para(p, '', 'problem'), para(p, '', 'significance'), para(p, '', 'gap'), para(p, 'Purpose', 'purpose'))
   },
   {
     id: 'objectives',
@@ -101,10 +101,19 @@ const TEMPLATES: Template[] = [
     }
   },
   {
+    id: 'framework',
+    title: 'Theoretical and conceptual framework',
+    keys: ['theory', 'theoryWhy', 'mechanism', 'conceptualFramework', 'logic.inputs', 'logic.activities', 'logic.outputs', 'logic.outcomes'],
+    build: (p) => {
+      const logic = [['Inputs', 'logic.inputs'], ['Activities', 'logic.activities'], ['Outputs', 'logic.outputs'], ['Outcomes', 'logic.outcomes']].filter(([, k]) => v(p, k)).map(([l, k]) => `${l}: ${v(p, k)}`).join('\n');
+      return join(para(p, 'Guiding theory', 'theory'), para(p, 'Fit', 'theoryWhy'), para(p, 'Mechanism', 'mechanism'), para(p, 'Conceptual framework', 'conceptualFramework'), logic ? `Logic model\n${logic}` : '');
+    }
+  },
+  {
     id: 'methods',
     title: 'Methods',
-    keys: ['design', 'inference', 'rationale', 'setting', 'exposure', 'comparator', 'dataSource', 'bias'],
-    build: (p) => join(para(p, 'Design', 'design'), para(p, 'This design supports', 'inference'), para(p, 'Rationale', 'rationale'), para(p, 'Setting and dates', 'setting'), para(p, 'Intervention/exposure', 'exposure'), para(p, 'Comparator', 'comparator'), para(p, 'Data source', 'dataSource'), para(p, 'Confounders and bias', 'bias'))
+    keys: ['design', 'inference', 'rationale', 'designAlternatives', 'setting', 'exposure', 'comparator', 'dataSource', 'procedures', 'bias'],
+    build: (p) => join(para(p, 'Design', 'design'), para(p, 'This design supports', 'inference'), para(p, 'Rationale', 'rationale'), para(p, 'Designs considered', 'designAlternatives'), para(p, 'Setting and dates', 'setting'), para(p, 'Intervention/exposure', 'exposure'), para(p, 'Comparator', 'comparator'), para(p, 'Data source', 'dataSource'), para(p, 'Procedures and timeline', 'procedures'), para(p, 'Confounders and bias', 'bias'))
   },
   {
     id: 'population',
@@ -115,8 +124,8 @@ const TEMPLATES: Template[] = [
   {
     id: 'measures',
     title: 'Measures and instruments',
-    keys: ['primaryOutcome', 'secondaryOutcomes', 'variables', 'instrument'],
-    build: (p) => join(para(p, 'Primary outcome', 'primaryOutcome'), para(p, 'Secondary outcomes', 'secondaryOutcomes'), para(p, 'Variables', 'variables'), para(p, 'Instruments', 'instrument'))
+    keys: ['primaryOutcome', 'outcomeLevel', 'secondaryOutcomes', 'variables', 'instrument', 'validityPlan', 'raterPlan'],
+    build: (p) => join(para(p, 'Primary outcome', 'primaryOutcome'), para(p, 'Outcome level', 'outcomeLevel'), para(p, 'Secondary outcomes', 'secondaryOutcomes'), para(p, 'Variables', 'variables'), para(p, 'Instruments', 'instrument'), para(p, 'Validity evidence plan', 'validityPlan'), para(p, 'Rater training and reliability', 'raterPlan'))
   },
   {
     id: 'analysis',
@@ -133,11 +142,12 @@ const TEMPLATES: Template[] = [
   {
     id: 'logistics',
     title: 'Logistics, resources and timeline',
-    keys: ['logistics.dataAccess', 'logistics.resources', 'training.course', 'training.date', 'feasibility', 'feasibilityReason', 'risksSummary'],
+    keys: ['logistics.dataAccess', 'logistics.resources', 'training.course', 'training.date', 'feasibility', 'feasibilityReason', 'risksSummary', 'timeline'],
     build: (p) => {
       const budget = p.lists.budget.filter((b) => b.item);
       const total = budget.reduce((s, b) => s + (Number(b.qty) || 0) * (Number(String(b.unit).replace(/[$,]/g, '')) || 0), 0);
       return join(
+        para(p, 'Timeline', 'timeline'),
         para(p, 'Data access', 'logistics.dataAccess'),
         para(p, 'Resources and data storage', 'logistics.resources'),
         v(p, 'training.course') ? `Human subjects training: ${v(p, 'training.course')}${v(p, 'training.date') ? `, completed ${v(p, 'training.date')}` : ' (not yet completed)'}` : '',

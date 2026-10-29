@@ -29,7 +29,7 @@ export function Callout({
   const color = tone === 'caution' ? 'var(--terra)' : tone === 'urgent' || tone === 'error' ? 'var(--err)' : tone === 'success' ? 'var(--ok)' : 'var(--teal)';
   return (
     <div
-      className={`flex gap-3 rounded-xl border p-3 sm:p-4 text-[15px] ${className}`}
+      className={`flex gap-3 rounded-xl border p-3 sm:p-4 text-[1.0625rem] ${className}`}
       style={{ background: t.bg, borderColor: t.border }}
       role={tone === 'urgent' || tone === 'error' ? 'alert' : undefined}
     >
@@ -66,7 +66,7 @@ export function Accordion({
   const H = `h${level}` as 'h2';
   return (
     <div className="border-b border-line last:border-b-0" id={id}>
-      <H className="text-[16px] font-semibold">
+      <H className="text-[1.125rem] font-semibold">
         <button
           type="button"
           className="flex w-full items-center justify-between gap-3 py-3.5 text-left min-h-[48px]"
@@ -83,7 +83,7 @@ export function Accordion({
           />
         </button>
       </H>
-      <div id={panelId} hidden={!open} className="pb-4 text-[15px] leading-relaxed">
+      <div id={panelId} hidden={!open} className="pb-4 text-[1.0625rem] leading-relaxed">
         {children}
       </div>
     </div>
@@ -94,10 +94,10 @@ export function Accordion({
 export function StackedTable({ title, columns, rows, caption }: { title?: string; columns: string[]; rows: string[][]; caption?: string }) {
   return (
     <figure className="min-w-0">
-      {title && <figcaption className="mb-2 text-[15px] font-semibold">{title}</figcaption>}
+      {title && <figcaption className="mb-2 text-[1.0625rem] font-semibold">{title}</figcaption>}
       {/* Desktop/tablet: real table */}
       <div className="hidden sm:block overflow-hidden rounded-xl border border-line bg-surface">
-        <table className="w-full border-collapse text-[14px]">
+        <table className="w-full border-collapse text-[1rem]">
           {caption && <caption className="sr-only">{caption}</caption>}
           <thead>
             <tr className="bg-sage text-left">
@@ -131,10 +131,10 @@ export function StackedTable({ title, columns, rows, caption }: { title?: string
       <ul className="sm:hidden space-y-2" aria-label={title}>
         {rows.map((r, i) => (
           <li key={i} className="card p-3">
-            <p className="font-semibold text-[15px]">{r[0]}</p>
+            <p className="font-semibold text-[1.0625rem]">{r[0]}</p>
             <dl className="mt-1.5 space-y-1">
               {r.slice(1).map((cell, j) => (
-                <div key={j} className="grid grid-cols-[minmax(0,40%)_1fr] gap-2 text-[14px]">
+                <div key={j} className="grid grid-cols-[minmax(0,40%)_1fr] gap-2 text-[1rem]">
                   <dt className="text-slate">{columns[j + 1]}</dt>
                   <dd className="m-0">{cell}</dd>
                 </div>
@@ -163,7 +163,7 @@ export function Segmented<T extends string | number>({
 }) {
   return (
     <fieldset className="min-w-0">
-      <legend className="mb-2 text-[14px] font-semibold">{label}</legend>
+      <legend className="mb-2 text-[1rem] font-semibold">{label}</legend>
       <div className="flex flex-wrap gap-2" role="radiogroup" aria-label={label}>
         {options.map((o) => {
           const id = `${name}-${o.value}`;
@@ -195,8 +195,8 @@ export function Segmented<T extends string | number>({
 export function EmptyState({ title, children, action }: { title: string; children?: ReactNode; action?: ReactNode }) {
   return (
     <div className="card p-6 text-center">
-      <p className="text-[17px] font-semibold">{title}</p>
-      {children && <div className="mt-2 text-slate text-[15px]">{children}</div>}
+      <p className="text-[1.1875rem] font-semibold">{title}</p>
+      {children && <div className="mt-2 text-slate text-[1.0625rem]">{children}</div>}
       {action && <div className="mt-4 flex justify-center">{action}</div>}
     </div>
   );
@@ -207,8 +207,8 @@ export function PageTitle({ eyebrow, title, children, actions }: { eyebrow?: str
     <div className="flex flex-wrap items-end justify-between gap-3">
       <div className="min-w-0">
         {eyebrow && <p className="eyebrow mb-1">{eyebrow}</p>}
-        <h1 className="text-[22px] sm:text-[26px] lg:text-[28px] font-bold">{title}</h1>
-        {children && <div className="mt-1 text-slate text-[15px]">{children}</div>}
+        <h1 className="text-[1.5rem] sm:text-[1.75rem] lg:text-[1.875rem] font-bold">{title}</h1>
+        {children && <div className="mt-1 text-slate text-[1.0625rem]">{children}</div>}
       </div>
       {actions && <div className="flex flex-wrap gap-2">{actions}</div>}
     </div>

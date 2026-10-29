@@ -15,7 +15,7 @@ const READY_META: Record<Readiness, { label: string; cls: string }> = {
 };
 
 export function ReadinessText({ r }: { r: Readiness }) {
-  return <span className={`text-[12.5px] font-semibold ${READY_META[r].cls}`}>Mentor: {READY_META[r].label}</span>;
+  return <span className={`text-[0.875rem] font-semibold ${READY_META[r].cls}`}>Mentor: {READY_META[r].label}</span>;
 }
 
 export function CountsBar({ project }: { project: Project }) {
@@ -28,7 +28,7 @@ export function CountsBar({ project }: { project: Project }) {
         {seg(c.proposed, 'var(--w1)', 'Proposed')}
         {seg(c.verify, 'var(--w4)', 'Needs verification')}
       </div>
-      <p className="mt-1.5 flex flex-wrap gap-x-3 gap-y-0.5 text-[12.5px] text-slate">
+      <p className="mt-1.5 flex flex-wrap gap-x-3 gap-y-0.5 text-[0.875rem] text-slate">
         <span><strong className="text-ok">{c.confirmed}</strong> confirmed</span>
         <span><strong className="text-teal">{c.proposed}</strong> proposed</span>
         <span><strong className="text-warn">{c.verify}</strong> to verify</span>
@@ -47,7 +47,7 @@ function LiveField({ project, update, def }: { project: Project; update: (fn: (p
   return (
     <li className="rounded-lg px-1 py-1">
       <div className="flex items-center justify-between gap-1">
-        <span className="min-w-0 truncate text-[12.5px] font-semibold text-slate">{def.label}</span>
+        <span className="min-w-0 truncate text-[0.875rem] font-semibold text-slate">{def.label}</span>
         <div className="flex shrink-0 items-center">
           <StatusMenu project={project} fieldKey={def.key} onChange={(s) => update((p) => setStatus(p, def.key, s))} />
           <button type="button" className="grid h-8 w-8 place-items-center rounded-md text-slate hover:bg-sage" aria-label={editing ? `Done editing ${def.label}` : `Edit ${def.label}`} onClick={() => setEditing((e) => !e)}>
@@ -57,22 +57,22 @@ function LiveField({ project, update, def }: { project: Project; update: (fn: (p
       </div>
       {editing ? (
         def.kind === 'select' ? (
-          <select className="input mt-1 !min-h-[38px] text-[14px]" value={v} aria-label={def.label} onChange={(e) => update((p) => setField(p, def.key, e.target.value, { origin: role === 'mentor' ? 'mentor' : 'resident' }))}>
+          <select className="input mt-1 !min-h-[38px] text-[1rem]" value={v} aria-label={def.label} onChange={(e) => update((p) => setField(p, def.key, e.target.value, { origin: role === 'mentor' ? 'mentor' : 'resident' }))}>
             <option value="">Choose…</option>
             {def.options!.map((o) => (
               <option key={o}>{o}</option>
             ))}
           </select>
         ) : (
-          <textarea className="input mt-1 min-h-[72px] text-[14px]" value={v} aria-label={def.label} autoFocus onChange={(e) => update((p) => setField(p, def.key, e.target.value, { origin: role === 'mentor' ? 'mentor' : 'resident' }))} />
+          <textarea className="input mt-1 min-h-[72px] text-[1rem]" value={v} aria-label={def.label} autoFocus onChange={(e) => update((p) => setField(p, def.key, e.target.value, { origin: role === 'mentor' ? 'mentor' : 'resident' }))} />
         )
       ) : (
-        <button type="button" onClick={() => setEditing(true)} className={`mt-0.5 block w-full rounded px-0.5 text-left text-[13.5px] hover:bg-sage ${v.trim() ? 'text-ink' : 'italic text-slate'}`}>
+        <button type="button" onClick={() => setEditing(true)} className={`mt-0.5 block w-full rounded px-0.5 text-left text-[0.9375rem] hover:bg-sage ${v.trim() ? 'text-ink' : 'italic text-slate'}`}>
           <span className="line-clamp-4 whitespace-pre-wrap">{v.trim() || 'Not yet defined'}</span>
         </button>
       )}
       {f?.flag && v.trim() && (
-        <p className="mt-1 flex items-center gap-1 text-[12px] font-semibold text-warn">
+        <p className="mt-1 flex items-center gap-1 text-[0.8125rem] font-semibold text-warn">
           <AlertTriangle size={12} aria-hidden /> Recheck: the question changed
         </p>
       )}
@@ -88,12 +88,12 @@ export function LiveBlueprint({ project, update, onNavigate }: { project: Projec
     <div className="space-y-3">
       <CountsBar project={project} />
       {items.length > 0 && (
-        <div className="rounded-xl border border-w4 bg-warn-soft px-3 py-2 text-[13px]">
+        <div className="rounded-xl border border-w4 bg-warn-soft px-3 py-2 text-[0.9375rem]">
           <p className="font-semibold text-warn">{items.length} item{items.length > 1 ? 's' : ''} need attention</p>
           <ul className="mt-1 space-y-0.5">
             {items.slice(0, 4).map((i) => (
               <li key={i.key}>
-                <Link to={i.key === 'sources' ? `/p/${project.id}/evidence` : `/p/${project.id}/week/${i.week}#f-${i.key}`} onClick={onNavigate} className="text-ink">
+                <Link to={i.key === 'sources' ? `/p/${project.id}/evidence` : `/p/${project.id}/stage/${i.week}#f-${i.key}`} onClick={onNavigate} className="text-ink">
                   {i.label}
                 </Link>
               </li>
@@ -112,9 +112,9 @@ export function LiveBlueprint({ project, update, onNavigate }: { project: Projec
               <button type="button" className="flex w-full items-center gap-2 px-3 py-2.5 text-left" aria-expanded={isOpen} onClick={() => setOpen((o) => ({ ...o, [s.id]: !isOpen }))}>
                 <span className={`h-6 w-1.5 shrink-0 rounded-full ${tone.bg}`} aria-hidden />
                 <span className="min-w-0 flex-1">
-                  <span className="block text-[14px] font-semibold leading-tight">{s.title}</span>
-                  <span className="text-[12px] text-slate">
-                    Week {s.week}
+                  <span className="block text-[1rem] font-semibold leading-tight">{s.title}</span>
+                  <span className="text-[0.8125rem] text-slate">
+                    Stage {s.week}
                     {fs.length > 0 && ` · ${filled}/${fs.length} filled`}
                     {s.id === 'references' && ` · ${project.sources.filter((x) => x.include).length} sources`}
                   </span>
@@ -146,7 +146,7 @@ function RefSummary({ project, onNavigate }: { project: Project; onNavigate?: ()
   const inc = project.sources.filter((s) => s.include);
   const ver = inc.filter((s) => s.verification.status === 'verified').length;
   return (
-    <Link to={`/p/${project.id}/evidence`} onClick={onNavigate} className="mb-2 flex items-center gap-2 rounded-lg bg-w2-soft px-2.5 py-2 text-[13px] text-ink no-underline hover:no-underline">
+    <Link to={`/p/${project.id}/evidence`} onClick={onNavigate} className="mb-2 flex items-center gap-2 rounded-lg bg-w2-soft px-2.5 py-2 text-[0.9375rem] text-ink no-underline hover:no-underline">
       <BookOpen size={15} className="text-w2-text" aria-hidden />
       <span>
         {inc.length} sources · {ver} verified · Evidence Library
@@ -171,19 +171,19 @@ export function FullBlueprint({ project, update }: { project: Project; update: (
           <section key={s.id} id={`s-${s.id}`} className="card scroll-mt-24 overflow-hidden" aria-labelledby={`h-${s.id}`}>
             <div className={`flex flex-wrap items-center justify-between gap-2 border-b border-line px-4 py-3 ${tone.soft}`}>
               <div>
-                <p className={`text-[12px] font-semibold uppercase tracking-[0.08em] ${tone.text}`}>Week {s.week} · {s.steps}</p>
-                <h2 id={`h-${s.id}`} className="text-[17px] font-bold">{s.title}</h2>
+                <p className={`text-[0.8125rem] font-semibold uppercase tracking-[0.08em] ${tone.text}`}>{s.steps}</p>
+                <h2 id={`h-${s.id}`} className="text-[1.1875rem] font-bold">{s.title}</h2>
               </div>
               <ReadinessText r={r} />
             </div>
             <div className="p-4">
               {s.id === 'references' && (
                 <div className="mb-4">
-                  <h3 className="text-[14px] font-semibold">References ({inc.length})</h3>
+                  <h3 className="text-[1rem] font-semibold">References ({inc.length})</h3>
                   {inc.length === 0 ? (
-                    <p className="mt-1 text-[14px] text-slate">No sources yet. Add and verify them in the <Link to={`/p/${project.id}/evidence`}>Evidence Library</Link>.</p>
+                    <p className="mt-1 text-[1rem] text-slate">No sources yet. Add and verify them in the <Link to={`/p/${project.id}/evidence`}>Evidence Library</Link>.</p>
                   ) : (
-                    <ol className="mt-1 list-decimal space-y-1 pl-5 text-[13.5px]">
+                    <ol className="mt-1 list-decimal space-y-1 pl-5 text-[0.9375rem]">
                       {inc.map((x) => (
                         <li key={x.id}>
                           {amaCitation(x)} <span className="font-semibold text-slate">[{STATUS_LABEL[x.verification.status]}]</span>
@@ -202,7 +202,7 @@ export function FullBlueprint({ project, update }: { project: Project; update: (
                 ))}
               </div>
               <div className="mt-4 border-t border-line pt-3">
-                <p className="flex items-center gap-1.5 text-[13.5px] font-semibold">
+                <p className="flex items-center gap-1.5 text-[0.9375rem] font-semibold">
                   <MessageSquare size={15} aria-hidden /> Section comments
                 </p>
                 <CommentThread
@@ -226,9 +226,9 @@ export function FullBlueprint({ project, update }: { project: Project; update: (
 export function OpenItemsList({ project }: { project: Project }) {
   const items = openItems(project);
   const unknownRequired = SECTIONS.flatMap((s) => sectionFields(project, s.id)).filter((f) => f.required && fstatus(project, f.key) === 'unknown');
-  if (!items.length && !unknownRequired.length) return <p className="mt-3 text-[13.5px] text-ok">No outstanding Blueprint issues.</p>;
+  if (!items.length && !unknownRequired.length) return <p className="mt-3 text-[0.9375rem] text-ok">No outstanding Blueprint issues.</p>;
   return (
-    <div className="mt-3 rounded-lg border border-w4 bg-warn-soft p-3 text-[13.5px]">
+    <div className="mt-3 rounded-lg border border-w4 bg-warn-soft p-3 text-[0.9375rem]">
       <p className="font-semibold text-warn">Outstanding issues</p>
       <ul className="mt-1 list-disc space-y-0.5 pl-5">
         {items.map((i) => (

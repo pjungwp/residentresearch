@@ -1,32 +1,21 @@
-# Research Forge — Resident Research Concierge
+# ResearchForge — Research Design Academy & Concierge
 
-A five-week studio that takes a resident from an idea to a faculty-reviewed IRB **draft**. An AI research mentor (Claude) works alongside a Live Research Blueprint the resident owns and edits.
+Two separate experiences that share one look and feel:
 
-| Week | Focus | Deliverable |
+| Tab | What it is | Saved where |
 |---|---|---|
-| 1 | Research story & question | "Once upon a time" story → PICOT / PEO / SPIDER question, FINER check |
-| 2 | Literature & evidence gap | Logged search, 3–5 verified and annotated sources, evidence gap, revised question |
-| 3 | Design, measures & analysis | Methods blueprint: design, outcomes, instrument, analysis, sample size |
-| 4 | Mentor, logistics & dissemination | Human-subjects training (CITI / OHRP), mentor, team, budget, timeline, risks, GO/REVISE/DEFER |
-| 5 | IRB draft | Assembled protocol draft, review category, consent and privacy plan, reflection |
+| **Research Design Academy** | Five-week mini-course in educational research design. Each week has 7 colorful slides (one idea each, a running example, a quick check), key ideas, evidence-based practice tips, an assignment with guided fields and examples, a **Submit** button, Word export, and checked references. | `localStorage` (`rf.course`), with JSON backup/restore |
+| **Research Design Concierge** | Free, self-paced tool for designing your own study in 7 stages: problem → question → framework → design → people & measures → analysis & ethics → protocol. Includes the Evidence Library (citation verification), the Protocol editor with DOCX export, and mentor review. | IndexedDB projects, with JSON export/import |
 
-Faculty checkpoints come after Weeks 2, 4 and 5. A project that passes the Week 5 checkpoint can be continued as the residency capstone.
+**Weeks:** 1 problem to question · 2 learning theory & conceptual frameworks · 3 research design · 4 assessment, measurement & validity · 5 analysis, ethics & proposal. Assignment answers can be copied into the Concierge with **Bring into Concierge**. This copy never overwrites a Concierge field you have already changed.
 
-## What it does
+**Submitting an assignment** saves a dated final copy and downloads a Word file. If a faculty email is set in Settings, it also opens an email to them. There is no server-side gradebook.
 
-- **Studio**: the default screen. You chat with the AI mentor, and its suggestions arrive as *proposed* Blueprint updates you Accept, Edit or Dismiss. Nothing is overwritten silently, and every field keeps its revision history.
-- **Field status**: each field is Confirmed, Proposed, Unknown or Needs verification. If you change the research question, downstream fields are flagged for review.
-- **Evidence Library**:
-  - Add sources by DOI, PMID, PMCID or a pasted citation, or search Europe PMC with an open-access filter.
-  - Each source is checked against Crossref, PubMed and Europe PMC, plus Unpaywall for open-access PDF links. Retractions are flagged.
-  - You can annotate sources, compare them, and export RIS or AMA citations.
-  - A citation is **never** marked verified just because the AI supplied it.
-- **Proposal editor**: builds a 16-section protocol from the Blueprint. It warns you when your edited text no longer matches the Blueprint and exports DOCX labeled "Draft — Pending Faculty and Institutional Review".
-- **Mentor Review**:
-  - Mentors comment on each section and mark it Ready, Needs revision or Pending.
-  - Mentors sign off at each checkpoint.
-  - The resident and mentor pass the project back and forth as a JSON backup, so no accounts are needed.
-- **Offline-capable PWA**: projects are stored in the browser (IndexedDB) with JSON export and import. Includes a dark theme and keyboard shortcuts (`Ctrl/Cmd+K` search; `g` then `s/w/e/p/r/b` to jump).
+**AI is optional everywhere.** Lessons, assignments, Concierge stages, citation checks and exports all work without it. Every AI button is labeled *uses paid API credits*, because each request is billed to the program's Anthropic account.
+
+**Readability:** the Aa button in the header switches text size between 100%, 112.5% (the default), 125% and 137.5%.
+
+Readings are standard health-professions-education sources, each one checked before it was added. They are not presented as any program's syllabus.
 
 ## Deploy to Netlify
 
@@ -35,7 +24,7 @@ Faculty checkpoints come after Weeks 2, 4 and 5. A project that passes the Week 
 
 | Variable | Required | Purpose |
 |---|---|---|
-| `ANTHROPIC_API_KEY` | yes | Claude API key. Used only inside the Edge Function and never sent to the browser. |
+| `ANTHROPIC_API_KEY` | for optional AI | Claude API key. Used only inside the Edge Function and never sent to the browser. Every AI request uses paid credits. |
 | `CONCIERGE_ACCESS_CODE` | strongly recommended | Shared code residents enter in Settings. Stops strangers from spending your API credits. |
 | `ANTHROPIC_MODEL` | no | Defaults to `claude-sonnet-5-5`. |
 | `CONCIERGE_WEB_SEARCH` | no | Set to `off` to disable Claude's web search tool. |

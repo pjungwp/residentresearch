@@ -5,7 +5,7 @@ import { SimpleShell, useProjectCtx, PageHeader, WeekStrip } from '@/components/
 import { FullBlueprint, CountsBar } from '@/components/blueprint';
 import { createProject, deleteProject, exportProjectJson, importProject, parseProjectJson, persist, setSettings, useProjects, useSettings, uid } from '@/lib/store';
 import { checkService } from '@/lib/ai';
-import { WEEKS } from '@/content/fields';
+import { WEEKS, TONE_CLASSES } from '@/content/fields';
 import { MASTER_PROMPT } from '@/content/masterPrompt';
 import { downloadFile, formatDate } from '@/lib/format';
 import { usePageTitle } from '@/lib/usePageTitle';
@@ -14,14 +14,14 @@ import { Segmented } from '@/components/ui/primitives';
 import { slug } from './evidence';
 import type { Project } from '@/lib/types';
 
-/** "/" → resume the last active project in one step; otherwise the project list. */
-export function RootRedirect() {
-  const { loaded, projects } = useProjects();
-  const { lastProjectId } = useSettings();
-  if (!loaded) return <div className="p-8 text-slate">Loading…</div>;
-  const active = projects.filter((p) => !p.archived);
-  const target = active.find((p) => p.id === lastProjectId) ?? active[0];
-  return <Navigate to={target ? `/p/${target.id}` : '/projects'} replace />;
+/** Old project links (/p/:id) open the current stage. */
+export function ProjectIndexRedirect() {
+  const { project } = useProjectCtx();
+  return <Navigate to={`/p/${project.id}/stage/${Math.min(project.currentWeek, 7)}`} replace />;
+}
+export function WeekRedirect() {
+  const { project } = useProjectCtx();
+  return <Navigate to={`/p/${project.id}/stage/${Math.min(project.currentWeek, 7)}`} replace />;
 }
 
 const STARTS = [
@@ -31,7 +31,7 @@ const STARTS = [
 ] as const;
 
 export function ProjectsPage() {
-  usePageTitle('Projects');
+  usePageTitle('Research Design Concierge');
   const { projects, loaded, error } = useProjects();
   const navigate = useNavigate();
   const toast = useToast();
@@ -52,7 +52,7 @@ export function ProjectsPage() {
     p.startMode = mode;
     await persist(p);
     setSettings({ lastProjectId: p.id });
-    navigate(`/p/${p.id}`, { state: { prompt: STARTS.find((s) => s.id === mode)!.opener } });
+    navigate(`/p/${p.id}/stage/1`);
   };
 
   const save = async (p: Project, fn: (x: Project) => void) => {
@@ -66,7 +66,8 @@ export function ProjectsPage() {
     <SimpleShell>
       <div className="mx-auto max-w-[1000px] px-[var(--gutter)] py-6">
         <PageHeader
-          title="Your research projects"
+          eyebrow="Free · self-paced"
+          title="Research Design Concierge"
           actions={
             <>
               <input ref={fileRef} type="file" accept="application/json,.json" className="sr-only" aria-label="Import project file" onChange={async (e) => {
@@ -86,24 +87,28 @@ export function ProjectsPage() {
             </>
           }
         >
-          Projects are stored in this browser. Export a backup to move between devices.
+          Design your own study in 7 stages. Saved in this browser.
         </PageHeader>
-        {error && <p className="mt-3 rounded-lg bg-err-soft p-3 text-[14px] text-err" role="alert">{error}</p>}
+        {error && <p className="mt-3 rounded-lg bg-err-soft p-3 text-[1rem] text-err" role="alert">{error}</p>}
 
         {creating && (
           <section className="card mt-4 overflow-hidden" aria-labelledby="new-h">
             <div className="h-1.5 bg-[linear-gradient(90deg,var(--w1),var(--w2),var(--w3),var(--w4),var(--w5))]" aria-hidden />
             <div className="p-4 sm:p-5">
-              <h2 id="new-h" className="text-[18px] font-bold">Start a research project</h2>
-              <p className="text-[14px] text-slate">Five weeks from idea to an IRB draft. You don’t need a complete idea to begin.</p>
+              <h2 id="new-h" className="text-[1.5rem]">Start a project</h2>
+              <ol className="mt-2 flex flex-wrap gap-1.5 text-[0.9375rem]">
+                {WEEKS.map((w) => (
+                  <li key={w.n} className={`rounded-full px-3 py-1 font-semibold ${TONE_CLASSES[w.tone].soft} ${TONE_CLASSES[w.tone].text}`}>{w.n}. {w.short}</li>
+                ))}
+              </ol>
               <fieldset className="mt-3">
                 <legend className="field-label">How would you like to start?</legend>
                 <div className="mt-2 grid gap-2 sm:grid-cols-3" role="radiogroup">
                   {STARTS.map((s) => (
                     <button key={s.id} type="button" role="radio" aria-checked={mode === s.id} onClick={() => setMode(s.id)} className={`rounded-xl border p-3 text-left ${mode === s.id ? 'border-teal bg-teal-soft' : 'border-line bg-surface hover:border-teal'}`}>
                       <s.icon size={20} className="text-teal" aria-hidden />
-                      <span className="mt-1 block text-[14.5px] font-semibold">{s.title}</span>
-                      <span className="block text-[13px] text-slate">{s.text}</span>
+                      <span className="mt-1 block text-[1.0625rem] font-semibold">{s.title}</span>
+                      <span className="block text-[0.9375rem] text-slate">{s.text}</span>
                     </button>
                   ))}
                 </div>
@@ -119,7 +124,7 @@ export function ProjectsPage() {
                 </label>
               </div>
               <div className="mt-4 flex gap-2">
-                <button className="btn btn-primary" onClick={create}>Open my Research Studio <ArrowRight size={17} aria-hidden /></button>
+                <button className="btn btn-primary" onClick={create}>Start designing <ArrowRight size={18} aria-hidden /></button>
                 {active.length > 0 && <button className="btn btn-ghost" onClick={() => setCreating(false)}>Cancel</button>}
               </div>
             </div>
@@ -145,14 +150,14 @@ export function ProjectsPage() {
 
         {archived.length > 0 && (
           <div className="mt-6">
-            <button className="text-[14px] font-semibold text-teal" onClick={() => setShowArchived((s) => !s)} aria-expanded={showArchived}>
+            <button className="text-[1rem] font-semibold text-teal" onClick={() => setShowArchived((s) => !s)} aria-expanded={showArchived}>
               {showArchived ? 'Hide' : 'Show'} archived ({archived.length})
             </button>
             {showArchived && (
               <ul className="mt-2 space-y-2">
                 {archived.map((p) => (
                   <li key={p.id} className="card flex flex-wrap items-center gap-2 p-3">
-                    <span className="min-w-0 flex-1 truncate text-[14.5px]">{p.title}</span>
+                    <span className="min-w-0 flex-1 truncate text-[1.0625rem]">{p.title}</span>
                     <button className="btn btn-ghost btn-sm" onClick={() => save(p, (x) => void (x.archived = false))}><ArchiveRestore size={15} aria-hidden /> Restore</button>
                     <button className="btn btn-ghost btn-sm !text-err" onClick={() => { if (window.confirm(`Permanently delete “${p.title}” from this device? Export a backup first if you might need it.`)) void deleteProject(p.id); }}><Trash2 size={15} aria-hidden /> Delete</button>
                   </li>
@@ -178,9 +183,9 @@ function ProjectCard({ p, onArchive, onDuplicate, onRename, onExport }: { p: Pro
           <button className="btn btn-primary btn-sm">Save</button>
         </form>
       ) : (
-        <Link to={`/p/${p.id}`} className="text-[16px] font-bold text-ink no-underline hover:underline">{p.title}</Link>
+        <Link to={`/p/${p.id}`} className="text-[1.125rem] font-bold text-ink no-underline hover:underline">{p.title}</Link>
       )}
-      <p className="mt-0.5 text-[13px] text-slate">Week {p.currentWeek} · {WEEKS[p.currentWeek - 1].title} · updated {formatDate(p.updatedAt)}</p>
+      <p className="mt-0.5 text-[0.9375rem] text-slate">Stage {Math.min(p.currentWeek, 7)} · {WEEKS[Math.min(p.currentWeek, 7) - 1].short} · {formatDate(p.updatedAt)}</p>
       <div className="mt-2"><WeekStrip project={p} interactive={false} /></div>
       <div className="mt-2"><CountsBar project={p} /></div>
       <div className="mt-3 flex flex-wrap gap-1.5">
@@ -205,7 +210,7 @@ export function BlueprintPage() {
       <div className="mt-3 card p-3"><CountsBar project={project} /></div>
       <nav aria-label="Blueprint sections" className="scroll-x-chips mt-3">
         {['problem', 'question', 'gap', 'design', 'outcomes', 'analysis', 'mentors', 'logistics', 'feasibility', 'dissemination', 'ethics', 'references'].map((id, i) => (
-          <a key={id} href={`#s-${id}`} className="chip !min-h-[34px] text-[13px]">{i + 1}</a>
+          <a key={id} href={`#s-${id}`} className="chip !min-h-[34px] text-[0.9375rem]">{i + 1}</a>
         ))}
       </nav>
       <div className="mt-3">
@@ -235,8 +240,8 @@ export function SettingsPage() {
       <div className="mx-auto max-w-[760px] space-y-4 px-[var(--gutter)] py-6">
         <PageHeader title="Settings" />
         <section className="card space-y-4 p-4">
-          <h2 className="text-[16px] font-bold">You</h2>
-          <Segmented name="role" label="I am using Research Forge as" value={s.role} onChange={(v) => setSettings({ role: v })} options={[{ value: 'resident', label: 'Resident' }, { value: 'mentor', label: 'Faculty mentor' }]} />
+          <h2 className="text-[1.125rem] font-bold">You</h2>
+          <Segmented name="role" label="I am using ResearchForge as" value={s.role} onChange={(v) => setSettings({ role: v })} options={[{ value: 'resident', label: 'Resident' }, { value: 'mentor', label: 'Faculty mentor' }]} />
           {s.role === 'mentor' && (
             <label className="block">
               <span className="field-label">Mentor name (shown on comments and sign-offs)</span>
@@ -247,8 +252,9 @@ export function SettingsPage() {
         </section>
 
         <section className="card space-y-3 p-4">
-          <h2 className="text-[16px] font-bold">AI mentor (Claude)</h2>
-          <div className="flex flex-wrap items-center gap-2 text-[14px]">
+          <h2 className="text-[1.25rem]">Optional AI (Claude)</h2>
+          <p className="rounded-xl bg-warn-soft p-3 text-[1rem] text-warn">AI help is optional everywhere. Each AI request uses <strong>paid API credits</strong> billed to your program’s Anthropic account. Lessons, assignments, the Concierge stages, citation checks and exports all work without AI.</p>
+          <div className="flex flex-wrap items-center gap-2 text-[1rem]">
             {checking ? (
               <span className="flex items-center gap-1.5 text-slate"><Loader2 size={15} className="animate-spin" aria-hidden /> Checking service…</span>
             ) : svc?.ok && svc.configured ? (
@@ -265,12 +271,25 @@ export function SettingsPage() {
               <input className="input mt-1" type="password" autoComplete="off" value={s.accessCode} onChange={(e) => setSettings({ accessCode: e.target.value })} />
             </label>
           )}
-          <p className="text-[13px] text-slate">Everything except the AI mentor works without this. The Claude API key lives on the server and is never stored in your browser or in exports.</p>
+          <p className="text-[0.9375rem] text-slate">The Claude API key lives on the server and is never stored in your browser or in exports.</p>
           {s.aiNoticeAccepted && <button className="btn btn-ghost btn-sm" onClick={() => setSettings({ aiNoticeAccepted: false })}>Show the AI notice again</button>}
         </section>
 
         <section className="card space-y-3 p-4">
-          <h2 className="text-[16px] font-bold">Citation checks</h2>
+          <h2 className="text-[1.25rem]">Academy submissions</h2>
+          <label className="block">
+            <span className="field-label">Your name</span>
+            <input className="input mt-1" value={s.learnerName} onChange={(e) => setSettings({ learnerName: e.target.value })} />
+          </label>
+          <label className="block">
+            <span className="field-label">Faculty email</span>
+            <span className="field-hint">Submitted assignments open an email to this address.</span>
+            <input className="input mt-1" type="email" value={s.facultyEmail} onChange={(e) => setSettings({ facultyEmail: e.target.value })} placeholder="faculty@hospital.org" />
+          </label>
+        </section>
+
+        <section className="card space-y-3 p-4">
+          <h2 className="text-[1.25rem]">Citation checks</h2>
           <label className="block">
             <span className="field-label">Email for open-access lookups (Unpaywall)</span>
             <span className="field-hint">Unpaywall asks callers to identify themselves by email. It is sent only with open-access lookups.</span>
@@ -279,8 +298,8 @@ export function SettingsPage() {
         </section>
 
         <section className="card space-y-3 p-4">
-          <h2 className="text-[16px] font-bold">Your data</h2>
-          <p className="text-[14px]">{projects.length} project{projects.length === 1 ? '' : 's'} stored in this browser (IndexedDB). Nothing syncs between devices.</p>
+          <h2 className="text-[1.125rem] font-bold">Your data</h2>
+          <p className="text-[1rem]">{projects.length} project{projects.length === 1 ? '' : 's'} stored in this browser (IndexedDB). Nothing syncs between devices.</p>
           <div className="flex flex-wrap gap-2">
             <button className="btn btn-secondary btn-sm" onClick={() => { downloadFile(`research-forge-all-projects-${new Date().toISOString().slice(0, 10)}.json`, JSON.stringify(projects.map((p) => JSON.parse(exportProjectJson(p))), null, 2)); toast('All projects exported'); }}>Export all projects</button>
             <button className="btn btn-danger btn-sm" onClick={async () => { if (!window.confirm('Delete ALL projects from this browser? This cannot be undone.')) return; for (const p of projects) await deleteProject(p.id); toast('All projects deleted'); }}>Delete all data</button>
@@ -288,8 +307,8 @@ export function SettingsPage() {
         </section>
 
         <details className="card p-4">
-          <summary className="cursor-pointer text-[15px] font-bold">View the AI mentor’s instructions (Master Prompt v2.0)</summary>
-          <pre className="mt-3 max-h-[50vh] overflow-auto whitespace-pre-wrap text-[12.5px]">{MASTER_PROMPT}</pre>
+          <summary className="cursor-pointer text-[1.0625rem] font-bold">View the AI mentor’s instructions (Master Prompt v2.0)</summary>
+          <pre className="mt-3 max-h-[50vh] overflow-auto whitespace-pre-wrap text-[0.875rem]">{MASTER_PROMPT}</pre>
         </details>
       </div>
     </SimpleShell>
@@ -300,23 +319,23 @@ export function AboutPage() {
   usePageTitle('About');
   return (
     <SimpleShell>
-      <div className="mx-auto max-w-[760px] space-y-4 px-[var(--gutter)] py-6 text-[15px] leading-relaxed">
-        <PageHeader eyebrow="MedEd Forge" title="About Research Forge" />
-        <p>Research Forge helps residents turn a clinical question into an IRB-ready draft over five weeks: research story and question, literature and evidence gap, study design and assessment, mentorship and feasibility, and the protocol. It is built on the Resident Research Project Concierge Master Prompt (v2.0).</p>
-        <h2 className="text-[17px] font-bold">What the AI does — and doesn’t</h2>
+      <div className="mx-auto max-w-[760px] space-y-4 px-[var(--gutter)] py-6 text-[1.0625rem] leading-relaxed">
+        <PageHeader eyebrow="MedEd Forge" title="About ResearchForge" />
+        <p>ResearchForge has two parts: the <strong>Research Design Academy</strong>, a five-week mini-course in educational research design, and the free <strong>Research Design Concierge</strong>, a seven-stage tool for designing your own study. AI help is optional and uses paid API credits. The AI mentor is built on the Resident Research Project Concierge Master Prompt (v2.0).</p>
+        <h2 className="text-[1.1875rem] font-bold">What the AI does — and doesn’t</h2>
         <ul className="list-disc space-y-1 pl-5">
           <li>Claude acts as a research mentor: it explains, questions and proposes. You decide. Nothing enters your Blueprint until you accept it.</li>
           <li>Citations are verified against Crossref, PubMed and Europe PMC by the app, never by the AI. Open-access copies come from PubMed Central, Europe PMC and Unpaywall.</li>
           <li>The app does not submit anything to an IRB and never represents a study as approved. Faculty review is not IRB approval.</li>
         </ul>
-        <h2 className="text-[17px] font-bold">Privacy</h2>
+        <h2 className="text-[1.1875rem] font-bold">Privacy</h2>
         <ul className="list-disc space-y-1 pl-5">
           <li>Projects are stored only in your browser. There are no accounts and no cloud copy. Export backups.</li>
           <li>When you use the AI mentor, your messages and a compact summary of your Blueprint are sent through the program’s server to Claude (Anthropic) to generate a reply.</li>
           <li>Citation lookups send identifiers (DOI, PMID) to public scholarly indexes; open-access lookups include the email you set.</li>
           <li>Do not enter PHI or identifiable trainee evaluations.</li>
         </ul>
-        <p className="text-[13.5px] text-slate">Not a substitute for your faculty mentor, a biostatistician, a medical librarian or your IRB.</p>
+        <p className="text-[0.9375rem] text-slate">Not a substitute for your faculty mentor, a biostatistician, a medical librarian or your IRB.</p>
         <Link to="/projects" className="btn btn-primary">Go to my projects</Link>
       </div>
     </SimpleShell>

@@ -39,7 +39,7 @@ export function ProposalPage() {
   return (
     <div className="mx-auto max-w-[1280px] px-[var(--gutter)] py-4">
       <PageHeader
-        eyebrow="Week 5 · Proposal & IRB"
+        eyebrow="Stage 7 · Protocol"
         tone="text-w5-text"
         title="Proposal editor"
         actions={
@@ -56,18 +56,18 @@ export function ProposalPage() {
         Assembled from your Blueprint. Edit any section directly; if the Blueprint changes later you’ll be asked to reconcile.
       </PageHeader>
 
-      <div className="mt-3 flex flex-wrap items-center gap-3 rounded-xl border border-w5 bg-w5-soft px-4 py-2.5 text-[14px]">
+      <div className="mt-3 flex flex-wrap items-center gap-3 rounded-xl border border-w5 bg-w5-soft px-4 py-2.5 text-[1rem]">
         <strong className="text-w5-text">{DRAFT_LABEL}</strong>
         <span className="text-slate">{issueCount ? `${issueCount} unresolved item${issueCount > 1 ? 's' : ''} flagged below` : 'No unresolved Blueprint items'}</span>
       </div>
 
       <div className="mt-4 grid grid-cols-[minmax(0,1fr)] gap-4 lg:grid-cols-[220px_minmax(0,1fr)]">
         <aside className="lg:sticky lg:top-[calc(var(--header-h)+30px)] lg:self-start">
-          <button className="flex w-full items-center justify-between rounded-lg px-2 py-1.5 text-[13px] font-semibold uppercase tracking-wide text-slate hover:bg-sage lg:pointer-events-none" aria-expanded={outline} onClick={() => setOutline((o) => !o)}>
+          <button className="flex w-full items-center justify-between rounded-lg px-2 py-1.5 text-[0.9375rem] font-semibold uppercase tracking-wide text-slate hover:bg-sage lg:pointer-events-none" aria-expanded={outline} onClick={() => setOutline((o) => !o)}>
             <span className="flex items-center gap-1.5"><ListTree size={15} aria-hidden /> Outline</span>
           </button>
           {outline && (
-            <ol className="mt-1 space-y-0.5 text-[13.5px]">
+            <ol className="mt-1 space-y-0.5 text-[0.9375rem]">
               {sections.map((s, i) => (
                 <li key={s.id}>
                   <a href={`#ps-${s.id}`} className="flex items-center gap-2 rounded-md px-2 py-1 text-ink no-underline hover:bg-sage hover:no-underline">
@@ -87,14 +87,14 @@ export function ProposalPage() {
         <div className="min-w-0">
           {preview ? (
             <article className="card mx-auto max-w-[820px] p-6 sm:p-10 print:border-0 print:shadow-none" aria-label="Document preview">
-              <p className="text-[12px] font-semibold uppercase tracking-[0.1em] text-w5-text">{DRAFT_LABEL}</p>
-              <h2 className="mt-2 text-[24px] font-bold">{project.title}</h2>
-              <p className="text-[14px] text-slate">Preliminary research protocol · {new Date().toLocaleDateString()}</p>
+              <p className="text-[0.8125rem] font-semibold uppercase tracking-[0.1em] text-w5-text">{DRAFT_LABEL}</p>
+              <h2 className="mt-2 text-[1.625rem] font-bold">{project.title}</h2>
+              <p className="text-[1rem] text-slate">Preliminary research protocol · {new Date().toLocaleDateString()}</p>
               {sections.map((s, i) => (
                 <section key={s.id} className="mt-6">
-                  <h3 className="text-[17px] font-bold">{i + 1}. {s.title}</h3>
-                  {s.text.trim() ? s.text.split(/\n{2,}/).map((b, j) => <p key={j} className="mt-2 whitespace-pre-wrap text-[15px] leading-relaxed">{b}</p>) : <p className="mt-2 text-[14px] italic text-warn">⚑ Not yet written</p>}
-                  {s.issues.map((x) => <p key={x.key} className="mt-1 text-[13px] italic text-warn">⚑ {x.label}: {ISSUE_TEXT[x.status]}</p>)}
+                  <h3 className="text-[1.1875rem] font-bold">{i + 1}. {s.title}</h3>
+                  {s.text.trim() ? s.text.split(/\n{2,}/).map((b, j) => <p key={j} className="mt-2 whitespace-pre-wrap text-[1.0625rem] leading-relaxed">{b}</p>) : <p className="mt-2 text-[1rem] italic text-warn">⚑ Not yet written</p>}
+                  {s.issues.map((x) => <p key={x.key} className="mt-1 text-[0.9375rem] italic text-warn">⚑ {x.label}: {ISSUE_TEXT[x.status]}</p>)}
                 </section>
               ))}
               <button className="btn btn-secondary no-print mt-8" onClick={() => window.print()}><Printer size={16} aria-hidden /> Print / save as PDF</button>
@@ -127,9 +127,9 @@ function SectionEditor({ s, n }: { s: DocSection; n: number }) {
   return (
     <section id={`ps-${s.id}`} className="card scroll-mt-28 p-4" aria-labelledby={`psh-${s.id}`}>
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <h2 id={`psh-${s.id}`} className="text-[16px] font-bold">
+        <h2 id={`psh-${s.id}`} className="text-[1.125rem] font-bold">
           {n}. {s.title}
-          {s.edited && <span className="ml-2 text-[12px] font-semibold text-slate">edited</span>}
+          {s.edited && <span className="ml-2 text-[0.8125rem] font-semibold text-slate">edited</span>}
         </h2>
         {!editing ? (
           <div className="flex gap-1.5">
@@ -146,7 +146,7 @@ function SectionEditor({ s, n }: { s: DocSection; n: number }) {
       </div>
 
       {s.stale && (
-        <div className="mt-2 rounded-lg border border-w4 bg-warn-soft p-3 text-[13.5px]" role="status">
+        <div className="mt-2 rounded-lg border border-w4 bg-warn-soft p-3 text-[0.9375rem]" role="status">
           <p className="flex items-center gap-1.5 font-semibold text-warn"><AlertTriangle size={15} aria-hidden /> Your Blueprint changed after you edited this section.</p>
           <p className="mt-1">Neither version was overwritten. Choose which to keep:</p>
           <details className="mt-1">
@@ -163,30 +163,30 @@ function SectionEditor({ s, n }: { s: DocSection; n: number }) {
       {editing ? (
         <div className="mt-2">
           <label htmlFor={`pt-${s.id}`} className="sr-only">{s.title} text</label>
-          <textarea id={`pt-${s.id}`} className="input min-h-[200px] text-[15px]" value={text} onChange={(e) => setText(e.target.value)} autoFocus />
+          <textarea id={`pt-${s.id}`} className="input min-h-[200px] text-[1.0625rem]" value={text} onChange={(e) => setText(e.target.value)} autoFocus />
           <div className="mt-2 flex gap-2">
             <button className="btn btn-primary btn-sm" onClick={save}><Check size={15} aria-hidden /> Save section</button>
             <button className="btn btn-ghost btn-sm" onClick={() => setEditing(false)}>Cancel</button>
           </div>
-          <p className="mt-1 text-[12.5px] text-slate">Edits here don’t change your Blueprint fields. Use the Blueprint for structured decisions.</p>
+          <p className="mt-1 text-[0.875rem] text-slate">Edits here don’t change your Blueprint fields. Use the Blueprint for structured decisions.</p>
         </div>
       ) : s.text.trim() ? (
-        <div className="mt-2 space-y-2 text-[15px] leading-relaxed">
+        <div className="mt-2 space-y-2 text-[1.0625rem] leading-relaxed">
           {s.text.split(/\n{2,}/).map((b, i) => <p key={i} className="whitespace-pre-wrap">{b}</p>)}
         </div>
       ) : (
-        <p className="mt-2 text-[14px] italic text-slate">Nothing yet — fill the related Blueprint fields or write this section.</p>
+        <p className="mt-2 text-[1rem] italic text-slate">Nothing yet — fill the related Blueprint fields or write this section.</p>
       )}
 
       {s.issues.length > 0 && (
-        <ul className="mt-3 space-y-1 border-t border-line pt-2 text-[13px]">
+        <ul className="mt-3 space-y-1 border-t border-line pt-2 text-[0.9375rem]">
           {s.issues.map((x) => (
             <li key={x.key} className="flex items-center gap-1.5 text-warn">
               <AlertTriangle size={13} aria-hidden />
               {s.id === 'references' ? (
                 <Link to={`/p/${project.id}/evidence`} className="text-warn">{x.label}</Link>
               ) : (
-                <Link to={`/p/${project.id}/week/${firstIssueWeek(x.key)}#f-${x.key}`} className="text-warn">{x.label}: {ISSUE_TEXT[x.status]}</Link>
+                <Link to={`/p/${project.id}/stage/${firstIssueWeek(x.key)}#f-${x.key}`} className="text-warn">{x.label}: {ISSUE_TEXT[x.status]}</Link>
               )}
             </li>
           ))}
@@ -204,7 +204,7 @@ function ExportPanel({ run, busy }: { run: (k: 'protocol' | 'blueprint') => void
   const [incoming, setIncoming] = useState<ReturnType<typeof parseProjectJson> | null>(null);
   return (
     <section id="export" className="card mt-6 scroll-mt-28 p-4" aria-labelledby="exp-h">
-      <h2 id="exp-h" className="text-[17px] font-bold">Export & backup</h2>
+      <h2 id="exp-h" className="text-[1.1875rem] font-bold">Export & backup</h2>
       <div className="mt-3 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
         <ExportCard icon={FileText} title="Preliminary protocol" text="DOCX assembled from approved Blueprint text, with unresolved items flagged.">
           <button className="btn btn-primary btn-sm" onClick={() => run('protocol')} disabled={!!busy}>Download DOCX</button>
@@ -215,11 +215,11 @@ function ExportPanel({ run, busy }: { run: (k: 'protocol' | 'blueprint') => void
         <ExportCard icon={Printer} title="PDF for review" text="Open the preview and use Print → Save as PDF.">
           <button className="btn btn-secondary btn-sm" onClick={() => { window.scrollTo({ top: 0 }); toast('Switch to Preview, then Print / save as PDF'); }}>How to</button>
         </ExportCard>
-        <ExportCard icon={Download} title="Weekly assignments" text="Each week page has its own Export week button.">
+        <ExportCard icon={Download} title="Stages" text="Export any single stage.">
           <div className="flex flex-wrap gap-1.5">
             {[1, 2, 3, 4, 5].map((n) => (
-              <button key={n} className="chip !min-h-[34px] text-[13px]" onClick={async () => (await import('@/lib/docx')).exportWeekly(project, n)}>
-                Week {n}
+              <button key={n} className="chip !min-h-[34px] text-[0.9375rem]" onClick={async () => (await import('@/lib/docx')).exportWeekly(project, n)}>
+                Stage {n}
               </button>
             ))}
           </div>
@@ -242,7 +242,7 @@ function ExportPanel({ run, busy }: { run: (k: 'protocol' | 'blueprint') => void
         </ExportCard>
       </div>
       {incoming && (
-        <div className="mt-3 rounded-lg border border-line bg-surface-2 p-3 text-[14px]" role="dialog" aria-label="Import options">
+        <div className="mt-3 rounded-lg border border-line bg-surface-2 p-3 text-[1rem]" role="dialog" aria-label="Import options">
           <p>
             <strong>{incoming.title}</strong> — last changed {new Date(incoming.updatedAt).toLocaleString()}, {incoming.comments.length} comments.
           </p>
@@ -257,7 +257,7 @@ function ExportPanel({ run, busy }: { run: (k: 'protocol' | 'blueprint') => void
           </div>
         </div>
       )}
-      <p className="mt-3 text-[12.5px] text-slate">Projects live in this browser only; nothing syncs between devices or with your mentor automatically. Export regularly.</p>
+      <p className="mt-3 text-[0.875rem] text-slate">Projects live in this browser only; nothing syncs between devices or with your mentor automatically. Export regularly.</p>
     </section>
   );
 }
@@ -265,8 +265,8 @@ function ExportPanel({ run, busy }: { run: (k: 'protocol' | 'blueprint') => void
 function ExportCard({ icon: Icon, title, text, children }: { icon: typeof FileText; title: string; text: string; children: React.ReactNode }) {
   return (
     <div className="flex flex-col gap-2 rounded-xl border border-line p-3">
-      <p className="flex items-center gap-2 text-[14.5px] font-semibold"><Icon size={17} className="text-teal" aria-hidden /> {title}</p>
-      <p className="flex-1 text-[13.5px] text-slate">{text}</p>
+      <p className="flex items-center gap-2 text-[1.0625rem] font-semibold"><Icon size={17} className="text-teal" aria-hidden /> {title}</p>
+      <p className="flex-1 text-[0.9375rem] text-slate">{text}</p>
       <div>{children}</div>
     </div>
   );

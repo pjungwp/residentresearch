@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { RouterProvider } from 'react-router-dom';
 import '@fontsource-variable/inter';
+import '@fontsource-variable/fraunces';
 import './styles/index.css';
 import { router } from './app/router';
 import { ToastProvider } from './components/ui/Toast';

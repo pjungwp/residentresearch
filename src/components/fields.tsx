@@ -16,7 +16,7 @@ export const STATUS_META: Record<FieldStatus, { label: string; text: string; Ico
 export function StatusText({ status }: { status: FieldStatus }) {
   const m = STATUS_META[status];
   return (
-    <span className={`inline-flex items-center gap-1 whitespace-nowrap text-[12.5px] font-semibold ${m.text}`}>
+    <span className={`inline-flex items-center gap-1 whitespace-nowrap text-[0.875rem] font-semibold ${m.text}`}>
       <m.Icon size={13} aria-hidden /> {m.label}
     </span>
   );
@@ -110,7 +110,7 @@ export function FieldEditor({ project, update, def, compact = false }: { project
           {def.required && <span className="sr-only"> (required)</span>}
         </label>
         <div className="-mr-1.5 flex items-center">
-          {f?.origin === 'ai' && <span className="mr-1 text-[12px] text-slate">AI-drafted</span>}
+          {f?.origin === 'ai' && <span className="mr-1 text-[0.8125rem] text-slate">AI-drafted</span>}
           {included.length > 0 && def.kind !== 'select' && (
             <IconBtn label={`Link sources to ${def.label}${refs.length ? `, ${refs.length} linked` : ''}`} pressed={panel === 'refs'} onClick={() => toggle('refs')} badge={refs.length}>
               <Link2 size={15} aria-hidden />
@@ -133,10 +133,10 @@ export function FieldEditor({ project, update, def, compact = false }: { project
         </span>
       )}
       {f?.flag && value.trim() && (
-        <div className="mb-1.5 flex items-start gap-2 rounded-lg border border-w4 bg-warn-soft px-2.5 py-1.5 text-[13px]">
+        <div className="mb-1.5 flex items-start gap-2 rounded-lg border border-w4 bg-warn-soft px-2.5 py-1.5 text-[0.9375rem]">
           <AlertTriangle size={14} className="mt-0.5 shrink-0 text-warn" aria-hidden />
           <span className="flex-1">{f.flag.reason}</span>
-          <button type="button" className="shrink-0 text-[12.5px] font-semibold text-warn underline" onClick={() => update((p) => clearFlag(p, def.key))}>
+          <button type="button" className="shrink-0 text-[0.875rem] font-semibold text-warn underline" onClick={() => update((p) => clearFlag(p, def.key))}>
             Still fits
           </button>
         </div>
@@ -156,18 +156,18 @@ export function FieldEditor({ project, update, def, compact = false }: { project
         <input {...common} className="input" placeholder={def.placeholder} />
       )}
       {refs.length > 0 && panel !== 'refs' && (
-        <p className="mt-1 text-[12.5px] text-slate">
+        <p className="mt-1 text-[0.875rem] text-slate">
           Sources: {refs.map((r) => included.findIndex((s) => s.id === r) + 1).filter((n) => n > 0).map((n) => `[${n}]`).join(' ')}
         </p>
       )}
 
       {panel === 'refs' && (
         <fieldset className="mt-2 rounded-lg border border-line bg-surface-2 p-2.5">
-          <legend className="px-1 text-[13px] font-semibold">Supporting sources</legend>
+          <legend className="px-1 text-[0.9375rem] font-semibold">Supporting sources</legend>
           <ul className="max-h-48 space-y-1 overflow-y-auto">
             {included.map((s, i) => (
               <li key={s.id}>
-                <label className="flex min-h-[36px] cursor-pointer items-start gap-2 rounded px-1 text-[13.5px] hover:bg-sage">
+                <label className="flex min-h-[36px] cursor-pointer items-start gap-2 rounded px-1 text-[0.9375rem] hover:bg-sage">
                   <input
                     type="checkbox"
                     className="mt-1 h-4 w-4 accent-[var(--btn-primary)]"
@@ -191,7 +191,7 @@ export function FieldEditor({ project, update, def, compact = false }: { project
         </fieldset>
       )}
       {panel === 'history' && f && (
-        <div className="mt-2 rounded-lg border border-line bg-surface-2 p-2.5 text-[13px]">
+        <div className="mt-2 rounded-lg border border-line bg-surface-2 p-2.5 text-[0.9375rem]">
           <p className="mb-1 font-semibold">Earlier versions</p>
           <ul className="space-y-1.5">
             {f.history.map((h, i) => (
@@ -203,7 +203,7 @@ export function FieldEditor({ project, update, def, compact = false }: { project
                   {h.value.slice(0, 260)}
                   {h.value.length > 260 && '…'}
                 </span>
-                <button type="button" className="shrink-0 text-[12.5px] font-semibold text-teal" onClick={() => update((p) => setField(p, def.key, h.value, { origin: 'resident', status: 'confirmed' }))}>
+                <button type="button" className="shrink-0 text-[0.875rem] font-semibold text-teal" onClick={() => update((p) => setField(p, def.key, h.value, { origin: 'resident', status: 'confirmed' }))}>
                   Restore
                 </button>
               </li>
@@ -239,7 +239,7 @@ function IconBtn({ label, pressed, onClick, children, badge = 0, badgeTone = 'te
     <button type="button" className={`relative grid h-8 w-8 place-items-center rounded-md hover:bg-sage ${pressed ? 'bg-sage text-ink' : 'text-slate'}`} aria-label={label} aria-pressed={pressed} title={label} onClick={onClick}>
       {children}
       {badge > 0 && (
-        <span className={`absolute -right-0.5 -top-0.5 grid h-4 min-w-4 place-items-center rounded-full px-1 text-[10px] font-bold text-white ${badgeTone === 'terra' ? 'bg-[var(--terra-ui)]' : 'bg-primary'}`}>{badge}</span>
+        <span className={`absolute -right-0.5 -top-0.5 grid h-4 min-w-4 place-items-center rounded-full px-1 text-[0.75rem] font-bold text-white ${badgeTone === 'terra' ? 'bg-[var(--terra-ui)]' : 'bg-primary'}`}>{badge}</span>
       )}
     </button>
   );
@@ -271,7 +271,7 @@ export function CommentThread({
       {comments
         .filter((c) => showResolved || !c.resolved)
         .map((n) => (
-          <div key={n.id} className={`flex items-start gap-2 rounded-lg px-2.5 py-2 text-[13.5px] ${n.resolved ? 'bg-sage text-slate' : n.role === 'mentor' ? 'bg-terra-soft' : 'bg-lavender'}`}>
+          <div key={n.id} className={`flex items-start gap-2 rounded-lg px-2.5 py-2 text-[0.9375rem] ${n.resolved ? 'bg-sage text-slate' : n.role === 'mentor' ? 'bg-terra-soft' : 'bg-lavender'}`}>
             <MessageSquare size={14} className={`mt-0.5 shrink-0 ${n.role === 'mentor' ? 'text-terra' : 'text-teal'}`} aria-hidden />
             <p className={`min-w-0 flex-1 ${n.resolved ? 'line-through' : ''}`}>
               <span className="font-semibold">{n.author}</span>
@@ -279,7 +279,7 @@ export function CommentThread({
               <br />
               {n.text}
             </p>
-            <button type="button" className="shrink-0 rounded px-1.5 py-1 text-[12.5px] font-semibold text-teal hover:bg-surface" onClick={() => onResolve(n.id)}>
+            <button type="button" className="shrink-0 rounded px-1.5 py-1 text-[0.875rem] font-semibold text-teal hover:bg-surface" onClick={() => onResolve(n.id)}>
               {n.resolved ? 'Reopen' : 'Resolve'}
             </button>
           </div>
@@ -297,7 +297,7 @@ export function CommentThread({
           <label htmlFor={id} className="sr-only">
             Comment on {label}
           </label>
-          <input id={id} className="input !min-h-[40px] text-[14px]" placeholder={placeholder} value={t} onChange={(e) => setT(e.target.value)} autoFocus />
+          <input id={id} className="input !min-h-[40px] text-[1rem]" placeholder={placeholder} value={t} onChange={(e) => setT(e.target.value)} autoFocus />
           <button className="btn btn-secondary btn-sm" type="submit">
             Add
           </button>
@@ -338,7 +338,7 @@ export function ListEditor<T extends Record<string, string>>({
   return (
     <div className="min-w-0">
       <div className="hidden overflow-x-auto rounded-xl border border-line bg-surface md:block">
-        <table className="w-full border-collapse text-[14px]">
+        <table className="w-full border-collapse text-[1rem]">
           <caption className="sr-only">{caption}</caption>
           <thead>
             <tr className="bg-sage text-left">
@@ -367,7 +367,7 @@ export function ListEditor<T extends Record<string, string>>({
                     <input
                       aria-label={`${c.label}, row ${i + 1}`}
                       type={c.type ?? 'text'}
-                      className="input !min-h-[38px] !px-2 !py-1 text-[14px]"
+                      className="input !min-h-[38px] !px-2 !py-1 text-[1rem]"
                       value={r[c.key] ?? ''}
                       placeholder={c.placeholder}
                       onChange={(e) => set(i, c.key, e.target.value)}
@@ -385,11 +385,11 @@ export function ListEditor<T extends Record<string, string>>({
         </table>
       </div>
       <ul className="space-y-2 md:hidden" aria-label={caption}>
-        {rows.length === 0 && <li className="text-[14px] text-slate">Nothing yet.</li>}
+        {rows.length === 0 && <li className="text-[1rem] text-slate">Nothing yet.</li>}
         {rows.map((r, i) => (
           <li key={i} className="card space-y-2 p-3">
             {columns.map((c) => (
-              <label key={c.key} className="block text-[13px] font-semibold">
+              <label key={c.key} className="block text-[0.9375rem] font-semibold">
                 {c.label}
                 <input type={c.type ?? 'text'} className="input mt-1" value={r[c.key] ?? ''} placeholder={c.placeholder} onChange={(e) => set(i, c.key, e.target.value)} />
               </label>

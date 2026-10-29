@@ -23,13 +23,13 @@ const flagNote = (text: string) => p(`⚑ ${text}`, { italics: true, color: '8A5
 
 function docShell(project: Project, title: string, children: Paragraph[] | (Paragraph | Table)[]) {
   return new Document({
-    creator: 'Research Forge (MedEd Forge)',
+    creator: 'ResearchForge (MedEd Forge)',
     title,
     styles: { default: { document: { run: { font: FONT, size: 22 } } } },
     sections: [
       {
         properties: { page: { margin: { top: 1080, bottom: 1080, left: 1200, right: 1200 } } },
-        headers: { default: new Header({ children: [new Paragraph({ alignment: AlignmentType.RIGHT, children: [new TextRun({ text: `MedEd Forge · Research Forge · ${DRAFT_LABEL}`, size: 16, color: '626579', font: FONT })] })] }) },
+        headers: { default: new Header({ children: [new Paragraph({ alignment: AlignmentType.RIGHT, children: [new TextRun({ text: `ResearchForge · ${DRAFT_LABEL}`, size: 16, color: '626579', font: FONT })] })] }) },
         footers: {
           default: new Footer({
             children: [new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: `${project.title} · generated ${new Date().toLocaleDateString()} · page `, size: 16, color: '626579', font: FONT }), new TextRun({ children: [PageNumber.CURRENT], size: 16, color: '626579', font: FONT })] })]
@@ -107,7 +107,7 @@ function sourcesTable(project: Project) {
 export async function exportWeekly(project: Project, n: number) {
   const w = WEEKS[n - 1];
   const reqs = weekRequirements(project, n);
-  const children: (Paragraph | Table)[] = [h(`Week ${n}: ${w.title}`, HeadingLevel.HEADING_1), p(`Deliverable: ${w.deliverable}`, { italics: true })];
+  const children: (Paragraph | Table)[] = [h(`Stage ${n}: ${w.title}`, HeadingLevel.HEADING_1), p(`Deliverable: ${w.deliverable}`, { italics: true })];
   const fields = fieldsForWeek(project, n);
   const story = fields.filter((f) => f.key.startsWith('story.'));
   if (story.length) {
@@ -136,7 +136,7 @@ export async function exportWeekly(project: Project, n: number) {
   children.push(h('Deliverable checklist', HeadingLevel.HEADING_2), ...reqs.map((r) => p(`${r.done ? '☑' : '☐'} ${r.label}`)));
   const fb = project.comments.filter((c) => c.role === 'mentor' && (c.target === `week:${n}` || groups.some((g) => g.id === c.target)));
   if (fb.length) children.push(h('Faculty feedback', HeadingLevel.HEADING_2), ...fb.map((c) => p(`${c.author} (${new Date(c.at).toLocaleDateString()}): ${c.text}${c.resolved ? ' — resolved' : ''}`)));
-  await save(docShell(project, `Week ${n} Assignment`, children), `${slug(project.title)}-week${n}.docx`);
+  await save(docShell(project, `Stage ${n}`, children), `${slug(project.title)}-stage${n}.docx`);
 }
 
 export async function exportBlueprint(project: Project) {

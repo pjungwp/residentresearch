@@ -11,12 +11,12 @@ const STATUS_WORD = { confirmed: 'CONFIRMED', proposed: 'PROPOSED', unknown: 'UN
 export function buildContext(p: Project, week: number): string {
   const lines: string[] = [];
   lines.push(`Project: ${p.title}`);
-  lines.push(`Current week: ${week} — ${WEEKS[week - 1].title} (${WEEKS[week - 1].steps})`);
+  lines.push(`Workflow: free Concierge (7 stages, user may jump). Current stage: ${week} — ${WEEKS[week - 1].title}`);
   lines.push(`Framework in use: ${activeFramework(p)}`);
   lines.push('');
   lines.push('## Blueprint (current-week sections in full; others summarized)');
   for (const s of SECTIONS) {
-    const current = s.week === week || (week === 5);
+    const current = s.week === week || week === 7;
     const fs = sectionFields(p, s.id);
     const rows = fs
       .map((f) => {

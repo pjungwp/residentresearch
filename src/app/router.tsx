@@ -1,7 +1,9 @@
 import { lazy, Suspense, type ReactNode } from 'react';
 import { createBrowserRouter, Link, Outlet } from 'react-router-dom';
 import { ProjectShell, ThemeSync, UpdatePrompt } from '@/components/shell';
-import { RootRedirect, ProjectsPage, SettingsPage, AboutPage, BlueprintPage } from '@/features/pages';
+import { ProjectsPage, SettingsPage, AboutPage, BlueprintPage, ProjectIndexRedirect, WeekRedirect } from '@/features/pages';
+import { HomePage, AcademyHome, AcademyWeek } from '@/features/academy';
+import { Navigate } from 'react-router-dom';
 import { StudioPage } from '@/features/studio';
 import { WeekPage } from '@/features/week';
 
@@ -24,11 +26,11 @@ function Root() {
 function RouteError() {
   return (
     <div className="mx-auto max-w-[560px] px-6 py-16 text-center">
-      <h1 className="text-[22px] font-bold">Something went wrong</h1>
-      <p className="mt-2 text-slate">Your projects are saved in this browser and were not affected. Reload to continue.</p>
+      <h1 className="text-[1.5rem] font-bold">Something went wrong</h1>
+      <p className="mt-2 text-slate">Your work is saved in this browser and was not affected. Reload to continue.</p>
       <div className="mt-5 flex justify-center gap-2">
         <button className="btn btn-primary" onClick={() => window.location.reload()}>Reload</button>
-        <Link to="/projects" className="btn btn-secondary">My projects</Link>
+        <Link to="/" className="btn btn-secondary">Home</Link>
       </div>
     </div>
   );
@@ -39,16 +41,21 @@ export const router = createBrowserRouter([
     element: <Root />,
     errorElement: <RouteError />,
     children: [
-      { path: '/', element: <RootRedirect /> },
-      { path: '/projects', element: <ProjectsPage /> },
+      { path: '/', element: <HomePage /> },
+      { path: '/academy', element: <AcademyHome /> },
+      { path: '/academy/week/:n', element: <AcademyWeek /> },
+      { path: '/concierge', element: <ProjectsPage /> },
+      { path: '/projects', element: <Navigate to="/concierge" replace /> },
       { path: '/settings', element: <SettingsPage /> },
       { path: '/about', element: <AboutPage /> },
       {
         path: '/p/:id',
         element: <ProjectShell />,
         children: [
-          { index: true, element: <StudioPage /> },
-          { path: 'week/:n', element: <WeekPage /> },
+          { index: true, element: <ProjectIndexRedirect /> },
+          { path: 'stage/:n', element: <WeekPage /> },
+          { path: 'week/:n', element: <WeekRedirect /> },
+          { path: 'mentor', element: <StudioPage /> },
           { path: 'blueprint', element: <BlueprintPage /> },
           { path: 'evidence', element: S(<EvidencePage />) },
           { path: 'proposal', element: S(<ProposalPage />) },

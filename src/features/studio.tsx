@@ -16,7 +16,7 @@ import { StatusText } from '@/components/fields';
 
 export function Markdown({ text }: { text: string }) {
   return (
-    <div className="md text-[15px] leading-relaxed">
+    <div className="md text-[1.0625rem] leading-relaxed">
       <ReactMarkdown remarkPlugins={[remarkGfm]} components={{ a: ({ href, children }) => <a href={href} target="_blank" rel="noopener noreferrer">{children}</a> }}>
         {text}
       </ReactMarkdown>
@@ -32,12 +32,12 @@ function nextAction(p: Project) {
 
 export function StudioPage() {
   const { project, update } = useProjectCtx();
-  usePageTitle(`Studio · ${project.title}`);
+  usePageTitle(`AI mentor · ${project.title}`);
   const settings = useSettings();
   const toast = useToast();
   const navigate = useNavigate();
   const loc = useLocation();
-  const week = WEEKS[project.currentWeek - 1];
+  const week = WEEKS[Math.min(project.currentWeek, WEEKS.length) - 1];
   const tone = TONE_CLASSES[week.tone];
   const [draft, setDraft] = useState('');
   const [streaming, setStreaming] = useState<{ text: string; citations: { url: string; title: string }[]; searches: string[] } | null>(null);
@@ -137,8 +137,7 @@ export function StudioPage() {
   const actions = useMemo(
     () => [
       ...week.actions.slice(0, 3),
-      { label: 'Propose Blueprint update', prompt: `Based on our conversation, propose updates for the Week ${week.n} Blueprint fields that are still unknown or weak. Use proposal blocks.` },
-      { label: 'Draft current assignment', prompt: `Help me draft my Week ${week.n} deliverable (${week.deliverable}) from what is already in my Blueprint. Point out what is missing; do not invent details.` }
+      { label: 'Propose Blueprint updates', prompt: `Based on our conversation, propose updates for the Stage ${week.n} Blueprint fields that are still unknown or weak. Use proposal blocks.` }
     ],
     [week]
   );
@@ -148,14 +147,15 @@ export function StudioPage() {
       {/* Compact assignment context */}
       <div className="shrink-0 px-[var(--gutter)] pt-3">
         <div className={`flex flex-wrap items-center gap-x-3 gap-y-1 rounded-xl border border-line px-3 py-2 ${tone.soft}`}>
-          <span className={`text-[12.5px] font-bold uppercase tracking-[0.08em] ${tone.text}`}>Week {week.n} · {week.short}</span>
-          <span className="min-w-0 flex-1 truncate text-[14px]">{week.deliverable}</span>
-          <Link to={`/p/${project.id}/week/${week.n}`} className="text-[13.5px] font-semibold">
-            Assignment
+          <span className={`text-[0.9375rem] font-bold uppercase tracking-[0.08em] ${tone.text}`}>Stage {week.n} · {week.short}</span>
+          <span className="min-w-0 flex-1 truncate text-[1.0625rem]">{week.deliverable}</span>
+          <span className="rounded-full bg-warn-soft px-2.5 py-0.5 text-[0.8125rem] font-semibold text-warn">Optional · paid credits</span>
+          <Link to={`/p/${project.id}/stage/${week.n}`} className="text-[1rem] font-semibold">
+            Back to stage
           </Link>
         </div>
         {next && (
-          <p className="mt-1.5 flex items-center gap-1.5 px-1 text-[13px] text-slate">
+          <p className="mt-1.5 flex items-center gap-1.5 px-1 text-[0.9375rem] text-slate">
             <ArrowRight size={14} className="shrink-0 text-teal" aria-hidden />
             <span className="min-w-0 truncate">
               Next: <strong className="font-semibold text-ink">{next.label}</strong>
@@ -171,11 +171,11 @@ export function StudioPage() {
           {project.chat.map((m) => (
             <li key={m.id}>
               {m.role === 'user' ? (
-                <div className="ml-auto w-fit max-w-[88%] rounded-2xl rounded-br-md bg-primary px-4 py-2.5 text-[15px] text-white">
+                <div className="ml-auto w-fit max-w-[88%] rounded-2xl rounded-br-md bg-primary px-4 py-2.5 text-[1.0625rem] text-white">
                   <p className="whitespace-pre-wrap">{m.text}</p>
                 </div>
               ) : m.error ? (
-                <div className="flex flex-wrap items-center gap-2 rounded-xl border border-err bg-err-soft px-3 py-2.5 text-[14px] text-err" role="alert">
+                <div className="flex flex-wrap items-center gap-2 rounded-xl border border-err bg-err-soft px-3 py-2.5 text-[1rem] text-err" role="alert">
                   <AlertTriangle size={16} aria-hidden /> <span className="flex-1">{m.error} Your Blueprint and drafts are safe.</span>
                   {lastUser && (
                     <button type="button" className="btn btn-secondary btn-sm" onClick={() => send(lastUser.text, { skipPhi: true, retryOf: lastUser.id })}>
@@ -194,14 +194,14 @@ export function StudioPage() {
                 <MentorAvatar />
                 <div className="min-w-0 flex-1">
                   {streaming.searches.length > 0 && (
-                    <p className="mb-1 flex items-center gap-1.5 text-[13px] text-slate">
+                    <p className="mb-1 flex items-center gap-1.5 text-[0.9375rem] text-slate">
                       <Globe size={14} aria-hidden /> Searched: {streaming.searches.join(' · ')}
                     </p>
                   )}
                   {streaming.text ? (
-                    splitWithProposals(streaming.text).map((part, i) => (part.kind === 'md' ? <Markdown key={i} text={part.text} /> : <p key={i} className="my-2 text-[13px] text-slate">Preparing a suggestion…</p>))
+                    splitWithProposals(streaming.text).map((part, i) => (part.kind === 'md' ? <Markdown key={i} text={part.text} /> : <p key={i} className="my-2 text-[0.9375rem] text-slate">Preparing a suggestion…</p>))
                   ) : (
-                    <p className="text-[14px] text-slate">Thinking…</p>
+                    <p className="text-[1rem] text-slate">Thinking…</p>
                   )}
                 </div>
               </div>
@@ -224,7 +224,7 @@ export function StudioPage() {
           />
         )}
         {phi && (
-          <div className="mb-2 rounded-xl border border-err bg-err-soft p-3 text-[14px]" role="alert">
+          <div className="mb-2 rounded-xl border border-err bg-err-soft p-3 text-[1rem]" role="alert">
             <p className="flex items-center gap-1.5 font-semibold text-err">
               <ShieldAlert size={16} aria-hidden /> This message may contain {phi.join(', ')}.
             </p>
@@ -237,7 +237,7 @@ export function StudioPage() {
         )}
         <div className="scroll-x-chips mb-2" role="group" aria-label="Suggested actions">
           {actions.map((a) => (
-            <button key={a.label} type="button" className="chip !min-h-[34px] text-[13.5px]" disabled={!!streaming} onClick={() => send(a.prompt)}>
+            <button key={a.label} type="button" className="chip !min-h-[34px] text-[0.9375rem]" disabled={!!streaming} onClick={() => send(a.prompt)}>
               <Sparkles size={14} className="text-teal" aria-hidden /> {a.label}
             </button>
           ))}
@@ -257,7 +257,7 @@ export function StudioPage() {
             ref={inputRef}
             rows={1}
             className="input max-h-[40vh] min-h-[48px] flex-1 resize-none !rounded-2xl"
-            placeholder="Message your research mentor…"
+            placeholder="Ask the AI mentor (optional)…"
             value={draft}
             enterKeyHint="send"
             onChange={(e) => {
@@ -282,7 +282,7 @@ export function StudioPage() {
             </button>
           )}
         </form>
-        <p className="mt-1.5 text-[12px] text-slate">AI suggestions can be wrong. Nothing enters your Blueprint until you accept it. No patient information.</p>
+        <p className="mt-1.5 text-[0.875rem] text-slate">Optional · uses paid credits · can be wrong · nothing enters your Blueprint until you accept it · no patient information.</p>
       </div>
     </div>
   );
@@ -307,11 +307,9 @@ function Welcome({ project, onPick }: { project: Project; onPick: (t: string) =>
     <div className="mx-auto max-w-[640px] py-4">
       <div className="flex gap-3">
         <MentorAvatar />
-        <div className="text-[15px] leading-relaxed">
-          <p>
-            Welcome to your Research Studio. I’ll help you turn an idea into a feasible proposal over five weeks — question, evidence, methods, planning and an IRB draft. You don’t need a complete idea to begin.
-          </p>
-          <p className="mt-2">{story ? 'I can see your story has started. Want to keep going from there?' : 'What clinical, educational or healthcare problem would you like to investigate?'}</p>
+        <div className="text-[1.0625rem] leading-relaxed">
+          <p>Optional AI mentor. I suggest; you decide. Each reply uses paid API credits.</p>
+          <p className="mt-2">{story ? 'Your story has started. Keep going from there?' : 'What problem would you like to study?'}</p>
         </div>
       </div>
       <ul className="mt-4 grid gap-2 sm:grid-cols-3">
@@ -319,7 +317,7 @@ function Welcome({ project, onPick }: { project: Project; onPick: (t: string) =>
           <li key={o.title}>
             <button type="button" onClick={() => onPick(o.text)} className="card h-full w-full p-3 text-left hover:border-teal">
               <o.icon size={20} className="text-teal" aria-hidden />
-              <span className="mt-1.5 block text-[14.5px] font-semibold">{o.title}</span>
+              <span className="mt-1.5 block text-[1.0625rem] font-semibold">{o.title}</span>
             </button>
           </li>
         ))}
@@ -330,10 +328,11 @@ function Welcome({ project, onPick }: { project: Project; onPick: (t: string) =>
 
 function AINotice({ onAccept, onCancel }: { onAccept: () => void; onCancel: () => void }) {
   return (
-    <div className="mb-2 rounded-xl border border-w1 bg-w1-soft p-3 text-[14px]" role="dialog" aria-label="Before you use the AI mentor">
+    <div className="mb-2 rounded-xl border border-w1 bg-w1-soft p-3 text-[1rem]" role="dialog" aria-label="Before you use the AI mentor">
       <p className="font-semibold">Before you use the AI mentor</p>
       <ul className="mt-1 list-disc space-y-0.5 pl-5">
-        <li>Your messages and Blueprint are sent to Claude (Anthropic) through your program’s server to generate replies.</li>
+        <li>AI help is optional. Each request uses paid API credits on your program’s account.</li>
+        <li>Your messages and Blueprint are sent to Claude (Anthropic) through your program’s server.</li>
         <li>Never include patient names, record numbers, dates of birth or other PHI, or identifiable trainee evaluations.</li>
         <li>AI can be wrong. Verify facts and citations; your mentor and IRB make the decisions.</li>
       </ul>
@@ -356,7 +355,7 @@ function AssistantMessage({ m, project, update }: { m: ChatMessage; project: Pro
       <MentorAvatar />
       <div className="min-w-0 flex-1">
         {m.searches && m.searches.length > 0 && (
-          <p className="mb-1 flex items-center gap-1.5 text-[13px] text-slate">
+          <p className="mb-1 flex items-center gap-1.5 text-[0.9375rem] text-slate">
             <Globe size={14} aria-hidden /> Searched: {m.searches.join(' · ')}
           </p>
         )}
@@ -369,7 +368,7 @@ function AssistantMessage({ m, project, update }: { m: ChatMessage; project: Pro
         )}
         {ids.length > 0 && <AddSources ids={ids} project={project} update={update} />}
         {m.citations && m.citations.length > 0 && (
-          <details className="mt-2 text-[13px]">
+          <details className="mt-2 text-[0.9375rem]">
             <summary className="cursor-pointer font-semibold text-slate">Web sources ({m.citations.length})</summary>
             <ul className="mt-1 space-y-0.5">
               {m.citations.map((c) => (
@@ -408,7 +407,7 @@ function ProposalCard({ pr, msg, project, update }: { pr: Proposal; msg: ChatMes
 
   if (!pr.valid || !def)
     return (
-      <div className="my-2 rounded-xl border border-line bg-surface-2 px-3 py-2 text-[13px] text-slate">
+      <div className="my-2 rounded-xl border border-line bg-surface-2 px-3 py-2 text-[0.9375rem] text-slate">
         A suggestion could not be applied ({pr.problem}). You can still copy the text: <span className="text-ink">{pr.value}</span>
       </div>
     );
@@ -416,10 +415,10 @@ function ProposalCard({ pr, msg, project, update }: { pr: Proposal; msg: ChatMes
   return (
     <div className={`my-3 overflow-hidden rounded-xl border bg-surface ${handled ? 'border-line opacity-80' : 'border-w1'}`}>
       <div className="flex flex-wrap items-center justify-between gap-2 border-b border-line bg-w1-soft px-3 py-2">
-        <p className="flex items-center gap-1.5 text-[13px] font-semibold text-w1-text">
+        <p className="flex items-center gap-1.5 text-[0.9375rem] font-semibold text-w1-text">
           <Sparkles size={14} aria-hidden /> Suggested Blueprint update · {def.label}
         </p>
-        <span className="text-[12.5px] text-slate">
+        <span className="text-[0.875rem] text-slate">
           Now: <StatusText status={status} />
         </span>
       </div>
@@ -435,17 +434,17 @@ function ProposalCard({ pr, msg, project, update }: { pr: Proposal; msg: ChatMes
             <textarea className="input min-h-[96px]" value={val} onChange={(e) => setVal(e.target.value)} aria-label={`Edit ${def.label}`} autoFocus />
           )
         ) : (
-          <p className="whitespace-pre-wrap text-[15px]">{pr.value}</p>
+          <p className="whitespace-pre-wrap text-[1.0625rem]">{pr.value}</p>
         )}
-        {pr.note && <p className="mt-1.5 text-[13px] text-slate">Why: {pr.note}</p>}
+        {pr.note && <p className="mt-1.5 text-[0.9375rem] text-slate">Why: {pr.note}</p>}
         {overwrites && !handled && (
-          <p className="mt-2 rounded-lg bg-warn-soft px-2.5 py-1.5 text-[13px] text-warn">
+          <p className="mt-2 rounded-lg bg-warn-soft px-2.5 py-1.5 text-[0.9375rem] text-warn">
             <strong>This would replace your confirmed text:</strong> “{current.slice(0, 160)}{current.length > 160 ? '…' : ''}”. The earlier version stays in revision history.
           </p>
         )}
         <div className="mt-2.5 flex flex-wrap gap-2">
           {handled ? (
-            <p className="flex items-center gap-1.5 text-[13.5px] font-semibold text-slate">
+            <p className="flex items-center gap-1.5 text-[0.9375rem] font-semibold text-slate">
               {handled === 'dismissed' ? <X size={15} aria-hidden /> : <Check size={15} className="text-ok" aria-hidden />}
               {handled === 'accepted' ? 'Accepted into Blueprint' : handled === 'edited' ? 'Edited and saved to Blueprint' : 'Dismissed'}
             </p>
@@ -496,13 +495,13 @@ function AddSources({ ids, project, update }: { ids: string[]; project: Project;
   };
   return (
     <div className="mt-2 rounded-xl border border-w2 bg-w2-soft p-2.5">
-      <p className="text-[12.5px] font-semibold text-w2-text">AI-suggested identifiers — unverified until checked</p>
+      <p className="text-[0.875rem] font-semibold text-w2-text">AI-suggested identifiers — unverified until checked</p>
       <div className="mt-1.5 flex flex-wrap gap-1.5">
         {ids.map((id) => (
-          <button key={id} type="button" className="chip !min-h-[34px] text-[13px]" disabled={have(id) || busy === id} onClick={() => add(id)}>
+          <button key={id} type="button" className="chip !min-h-[34px] text-[0.9375rem]" disabled={have(id) || busy === id} onClick={() => add(id)}>
             <BookPlus size={14} aria-hidden />
             {have(id) ? 'In library: ' : busy === id ? 'Verifying… ' : 'Add & verify '}
-            <span className="font-mono text-[12px]">{id.replace(/^(doi|pmid|pmcid):/, '')}</span>
+            <span className="font-mono text-[0.8125rem]">{id.replace(/^(doi|pmid|pmcid):/, '')}</span>
           </button>
         ))}
       </div>

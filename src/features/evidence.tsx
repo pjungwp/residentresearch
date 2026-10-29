@@ -24,7 +24,7 @@ const STATUS_STYLE: Record<VStatus, { cls: string; Icon: typeof ShieldCheck }> =
 export function VerifyBadge({ s }: { s: SourceRecord }) {
   const st = STATUS_STYLE[s.verification.status];
   return (
-    <span className={`inline-flex items-center gap-1 whitespace-nowrap text-[12.5px] font-semibold ${st.cls}`}>
+    <span className={`inline-flex items-center gap-1 whitespace-nowrap text-[0.875rem] font-semibold ${st.cls}`}>
       <st.Icon size={14} aria-hidden /> {STATUS_LABEL[s.verification.status]}
     </span>
   );
@@ -33,7 +33,7 @@ export function VerifyBadge({ s }: { s: SourceRecord }) {
 export function AccessBadge({ s }: { s: SourceRecord }) {
   const open = isOpen(s.access);
   return (
-    <span className={`inline-flex items-center gap-1 whitespace-nowrap text-[12.5px] font-semibold ${open ? 'text-w3-text' : s.access === 'preprint' ? 'text-warn' : 'text-slate'}`}>
+    <span className={`inline-flex items-center gap-1 whitespace-nowrap text-[0.875rem] font-semibold ${open ? 'text-w3-text' : s.access === 'preprint' ? 'text-warn' : 'text-slate'}`}>
       {open ? <Unlock size={13} aria-hidden /> : <Lock size={13} aria-hidden />} {ACCESS_LABEL[s.access]}
     </span>
   );
@@ -148,7 +148,7 @@ export function EvidencePage() {
   return (
     <div className="mx-auto max-w-[1280px] px-[var(--gutter)] py-4">
       <PageHeader
-        eyebrow="Week 2 · Evidence Library"
+        eyebrow="Evidence Library"
         tone="text-w2-text"
         title="Evidence Library"
         actions={
@@ -168,7 +168,7 @@ export function EvidencePage() {
         Verified metadata comes from Crossref, PubMed and Europe PMC — never from AI text.
       </PageHeader>
 
-      <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-1 rounded-xl border border-line bg-surface px-4 py-2.5 text-[14px]">
+      <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-1 rounded-xl border border-line bg-surface px-4 py-2.5 text-[1rem]">
         <span><strong>{inc.length}</strong> included</span>
         <span className="text-ok"><strong>{verified}</strong> verified</span>
         <span className="text-w3-text"><strong>{oa}</strong> of {inc.length} open access</span>
@@ -214,13 +214,13 @@ export function EvidencePage() {
             </form>
             {candidates && candidates.length > 0 && (
               <div className="mt-3">
-                <p className="text-[14px] font-semibold">Which article did you mean?</p>
+                <p className="text-[1rem] font-semibold">Which article did you mean?</p>
                 <ul className="mt-1.5 space-y-1.5">
                   {candidates.map((c) => (
-                    <li key={(c.doi ?? c.pmid ?? c.title) + c.year} className="flex flex-wrap items-start justify-between gap-2 rounded-lg border border-line p-2.5 text-[14px]">
+                    <li key={(c.doi ?? c.pmid ?? c.title) + c.year} className="flex flex-wrap items-start justify-between gap-2 rounded-lg border border-line p-2.5 text-[1rem]">
                       <span className="min-w-0 flex-1">
                         <span className="font-medium">{c.title}</span>
-                        <span className="block text-[13px] text-slate">
+                        <span className="block text-[0.9375rem] text-slate">
                           {c.authorString} · {c.journal} {c.year} {c.doi && `· doi:${c.doi}`}
                         </span>
                       </span>
@@ -254,17 +254,17 @@ export function EvidencePage() {
       {/* Library */}
       <section className="mt-4" aria-labelledby="lib-h">
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <h2 id="lib-h" className="text-[17px] font-bold">Sources ({project.sources.length})</h2>
+          <h2 id="lib-h" className="text-[1.1875rem] font-bold">Sources ({project.sources.length})</h2>
           <div className="flex gap-1.5" role="group" aria-label="Filter">
             {(['all', 'included', 'excluded'] as const).map((f) => (
-              <button key={f} className="chip !min-h-[34px] text-[13px]" aria-pressed={filter === f} onClick={() => setFilter(f)}>
+              <button key={f} className="chip !min-h-[34px] text-[0.9375rem]" aria-pressed={filter === f} onClick={() => setFilter(f)}>
                 {f[0].toUpperCase() + f.slice(1)}
               </button>
             ))}
           </div>
         </div>
         {project.sources.length === 0 ? (
-          <p className="card mt-2 p-5 text-[14.5px] text-slate">No sources yet. Add a DOI or PMID above, search PubMed records, or ask the AI mentor to find open-access sources and click “Add & verify”.</p>
+          <p className="card mt-2 p-5 text-[1.0625rem] text-slate">No sources yet. Add a DOI or PMID above, search PubMed records, or ask the AI mentor to find open-access sources and click “Add & verify”.</p>
         ) : (
           <ul className="mt-2 space-y-2">
             {shown.map((s) => (
@@ -278,7 +278,7 @@ export function EvidencePage() {
             ))}
           </ul>
         )}
-        {compare.length === 1 && <p className="mt-2 text-[13.5px] text-slate">Select one or two more sources to compare.</p>}
+        {compare.length === 1 && <p className="mt-2 text-[0.9375rem] text-slate">Select one or two more sources to compare.</p>}
       </section>
     </div>
   );
@@ -319,26 +319,26 @@ function LiteratureSearch({ onImport, exists }: { onImport: (id: string) => Prom
           Search terms
         </label>
         <input id="lit-q" className="input flex-1" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Keywords, or paste your PubMed search string" />
-        <label className="flex min-h-[44px] items-center gap-2 text-[14px]">
+        <label className="flex min-h-[44px] items-center gap-2 text-[1rem]">
           <input type="checkbox" className="h-5 w-5 accent-[var(--btn-primary)]" checked={oaOnly} onChange={(e) => setOaOnly(e.target.checked)} /> Open access only
         </label>
         <button className="btn btn-primary" disabled={loading}>
           {loading ? <Loader2 size={17} className="animate-spin" aria-hidden /> : <Search size={17} aria-hidden />} Search
         </button>
       </form>
-      <p className="mt-1 text-[12.5px] text-slate">Searches PubMed (MEDLINE) records through Europe PMC. Log the search in Week 2.</p>
-      {err && <p className="mt-2 text-[14px] text-err" role="alert">{err}</p>}
+      <p className="mt-1 text-[0.875rem] text-slate">Searches PubMed (MEDLINE) records through Europe PMC. Log searches in Stage 2.</p>
+      {err && <p className="mt-2 text-[1rem] text-err" role="alert">{err}</p>}
       {results && (
         <ul className="mt-3 space-y-1.5" aria-live="polite">
-          {results.length === 0 && <li className="text-[14px] text-slate">No results.</li>}
+          {results.length === 0 && <li className="text-[1rem] text-slate">No results.</li>}
           {results.map((r) => {
             const id = r.doi ?? (r.pmid ? `PMID ${r.pmid}` : undefined);
             const have = exists({ doi: r.doi?.toLowerCase(), pmid: r.pmid });
             return (
               <li key={r.id} className="flex flex-wrap items-start justify-between gap-2 rounded-lg border border-line p-2.5">
-                <span className="min-w-0 flex-1 text-[14px]">
+                <span className="min-w-0 flex-1 text-[1rem]">
                   <span className="font-medium">{r.title}</span>
-                  <span className="block text-[13px] text-slate">
+                  <span className="block text-[0.9375rem] text-slate">
                     {r.authorString?.slice(0, 120)} · {r.journalTitle} {r.pubYear}
                     {r.isOpenAccess === 'Y' && <span className="ml-1 font-semibold text-w3-text">· Open access</span>}
                     {(r.pubType ?? '').match(/review|guideline|meta-analysis/i) && <span className="ml-1 font-semibold text-w2-text">· {r.pubType.split(';')[0]}</span>}
@@ -437,12 +437,12 @@ function SourceRow({ s, index, comparing, onCompare }: { s: SourceRecord; index:
   };
 
   const ann = (k: keyof typeof a, label: string, long = true) => (
-    <label className="block text-[13px] font-semibold">
+    <label className="block text-[0.9375rem] font-semibold">
       {label}
       {long ? (
-        <textarea className="input mt-1 min-h-[64px] text-[14px] font-normal" value={String(a[k] ?? '')} onChange={(e) => set((x) => void ((x.annotation as any)[k] = e.target.value))} />
+        <textarea className="input mt-1 min-h-[64px] text-[1rem] font-normal" value={String(a[k] ?? '')} onChange={(e) => set((x) => void ((x.annotation as any)[k] = e.target.value))} />
       ) : (
-        <input className="input mt-1 text-[14px] font-normal" value={String(a[k] ?? '')} onChange={(e) => set((x) => void ((x.annotation as any)[k] = e.target.value))} />
+        <input className="input mt-1 text-[1rem] font-normal" value={String(a[k] ?? '')} onChange={(e) => set((x) => void ((x.annotation as any)[k] = e.target.value))} />
       )}
     </label>
   );
@@ -451,13 +451,13 @@ function SourceRow({ s, index, comparing, onCompare }: { s: SourceRecord; index:
   return (
     <li id={s.id} className={`card overflow-hidden ${s.include ? '' : 'opacity-75'}`}>
       <div className="flex items-start gap-3 p-3">
-        <span className="mt-0.5 grid h-7 w-7 shrink-0 place-items-center rounded-lg bg-w2-soft text-[13px] font-bold text-w2-text" aria-hidden>
+        <span className="mt-0.5 grid h-7 w-7 shrink-0 place-items-center rounded-lg bg-w2-soft text-[0.9375rem] font-bold text-w2-text" aria-hidden>
           {index >= 0 ? index + 1 : '–'}
         </span>
         <div className="min-w-0 flex-1">
           <button type="button" className="block w-full text-left" aria-expanded={open} onClick={() => setOpen((o) => !o)}>
-            <span className="block text-[15px] font-semibold leading-snug">{s.title ?? s.input}</span>
-            <span className="mt-0.5 block text-[13px] text-slate">
+            <span className="block text-[1.0625rem] font-semibold leading-snug">{s.title ?? s.input}</span>
+            <span className="mt-0.5 block text-[0.9375rem] text-slate">
               {s.authors.slice(0, 3).join(', ')}
               {s.authors.length > 3 && ' et al.'} {s.journalAbbrev ?? s.journal ? `· ${s.journalAbbrev ?? s.journal}` : ''} {s.year && `· ${s.year}`}
             </span>
@@ -465,23 +465,23 @@ function SourceRow({ s, index, comparing, onCompare }: { s: SourceRecord; index:
           <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1">
             <VerifyBadge s={s} />
             <AccessBadge s={s} />
-            {a.level && <span className="text-[12.5px] font-semibold text-w2-text">{a.level}</span>}
-            {a.readFullText && <span className="text-[12.5px] text-ok">Read in full</span>}
-            {s.addedBy === 'ai' && <span className="text-[12.5px] text-slate">Suggested by AI</span>}
+            {a.level && <span className="text-[0.875rem] font-semibold text-w2-text">{a.level}</span>}
+            {a.readFullText && <span className="text-[0.875rem] text-ok">Read in full</span>}
+            {s.addedBy === 'ai' && <span className="text-[0.875rem] text-slate">Suggested by AI</span>}
             {(s.pdfUrl ?? s.fullTextUrl) && (
-              <a href={s.pdfUrl ?? s.fullTextUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-[13px] font-semibold">
+              <a href={s.pdfUrl ?? s.fullTextUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-[0.9375rem] font-semibold">
                 {s.pdfUrl ? <FileDown size={14} aria-hidden /> : <ExternalLink size={14} aria-hidden />} {s.pdfUrl ? 'PDF' : 'Full text'}
               </a>
             )}
           </div>
-          {a.findings && !open && <p className="mt-1 line-clamp-2 text-[13.5px]">{a.findings}</p>}
+          {a.findings && !open && <p className="mt-1 line-clamp-2 text-[0.9375rem]">{a.findings}</p>}
         </div>
         <div className="flex shrink-0 flex-col items-end gap-1">
-          <label className="flex min-h-[36px] items-center gap-1.5 text-[13px]">
+          <label className="flex min-h-[36px] items-center gap-1.5 text-[0.9375rem]">
             <input type="checkbox" className="h-5 w-5 accent-[var(--btn-primary)]" checked={s.include} onChange={(e) => set((x) => void (x.include = e.target.checked))} />
             Include
           </label>
-          <button type="button" className={`chip !min-h-[32px] !px-2 text-[12.5px]`} aria-pressed={comparing} onClick={onCompare}>
+          <button type="button" className={`chip !min-h-[32px] !px-2 text-[0.875rem]`} aria-pressed={comparing} onClick={onCompare}>
             <Columns3 size={13} aria-hidden /> Compare
           </button>
           <button type="button" className="grid h-9 w-9 place-items-center rounded-md text-slate hover:bg-sage" aria-label={open ? 'Collapse details' : 'Expand details'} aria-expanded={open} onClick={() => setOpen((o) => !o)}>
@@ -492,12 +492,12 @@ function SourceRow({ s, index, comparing, onCompare }: { s: SourceRecord; index:
 
       {open && (
         <div className="grid gap-4 border-t border-line p-3 lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]">
-          <div className="min-w-0 space-y-3 text-[14px]">
+          <div className="min-w-0 space-y-3 text-[1rem]">
             <div>
-              <p className="text-[13px] font-semibold">AMA citation</p>
+              <p className="text-[0.9375rem] font-semibold">AMA citation</p>
               <p className="mt-0.5">{amaCitation(s)}</p>
             </div>
-            <dl className="grid grid-cols-[80px_1fr] gap-x-2 gap-y-1 text-[13.5px]">
+            <dl className="grid grid-cols-[80px_1fr] gap-x-2 gap-y-1 text-[0.9375rem]">
               {s.doi && (<><dt className="text-slate">DOI</dt><dd className="m-0 break-all"><a href={`https://doi.org/${s.doi}`} target="_blank" rel="noopener noreferrer">{s.doi}</a></dd></>)}
               {s.pmid && (<><dt className="text-slate">PMID</dt><dd className="m-0"><a href={`https://pubmed.ncbi.nlm.nih.gov/${s.pmid}/`} target="_blank" rel="noopener noreferrer">{s.pmid}</a></dd></>)}
               {s.pmcid && (<><dt className="text-slate">PMCID</dt><dd className="m-0">{s.pmcid}</dd></>)}
@@ -511,32 +511,32 @@ function SourceRow({ s, index, comparing, onCompare }: { s: SourceRecord; index:
               </dd>
             </dl>
             <div className="rounded-lg bg-surface-2 p-2.5">
-              <p className="flex items-center justify-between gap-2 text-[13px] font-semibold">
+              <p className="flex items-center justify-between gap-2 text-[0.9375rem] font-semibold">
                 Verification
                 <button className="btn btn-ghost btn-sm !min-h-[30px]" onClick={reverify} disabled={busy === 'verify'}>
                   {busy === 'verify' ? <Loader2 size={14} className="animate-spin" aria-hidden /> : <RefreshCw size={14} aria-hidden />} Recheck
                 </button>
               </p>
-              <p className="mt-1 text-[13px]">
+              <p className="mt-1 text-[0.9375rem]">
                 <VerifyBadge s={s} /> {v.method.length ? `via ${v.method.join(', ')}` : ''}
                 {v.checkedAt && <span className="text-slate"> · checked {new Date(v.checkedAt).toLocaleDateString()}</span>}
                 {v.recheckedAt && <span className="text-slate"> · rechecked {new Date(v.recheckedAt).toLocaleDateString()}</span>}
               </p>
               {v.mismatches.length > 0 && (
-                <ul className="mt-1 list-disc pl-5 text-[13px] text-warn">
+                <ul className="mt-1 list-disc pl-5 text-[0.9375rem] text-warn">
                   {v.mismatches.map((m) => <li key={m}>{m}</li>)}
                 </ul>
               )}
               {v.notes.length > 0 && (
-                <ul className="mt-1 list-disc pl-5 text-[13px] text-slate">
+                <ul className="mt-1 list-disc pl-5 text-[0.9375rem] text-slate">
                   {v.notes.map((m) => <li key={m}>{m}</li>)}
                 </ul>
               )}
             </div>
             {s.abstract && (
               <details>
-                <summary className="cursor-pointer text-[13.5px] font-semibold">Abstract</summary>
-                <p className="mt-1 text-[13.5px] leading-relaxed">{s.abstract}</p>
+                <summary className="cursor-pointer text-[0.9375rem] font-semibold">Abstract</summary>
+                <p className="mt-1 text-[0.9375rem] leading-relaxed">{s.abstract}</p>
               </details>
             )}
             <div className="flex flex-wrap gap-2">
@@ -553,17 +553,17 @@ function SourceRow({ s, index, comparing, onCompare }: { s: SourceRecord; index:
                 <Trash2 size={14} aria-hidden /> Remove
               </button>
             </div>
-            <p className="text-[12px] text-slate">Attach only PDFs you are permitted to keep. Attached files stay on this device.</p>
+            <p className="text-[0.8125rem] text-slate">Attach only PDFs you are permitted to keep. Attached files stay on this device.</p>
           </div>
 
           <div className="min-w-0 space-y-2.5">
             <div className="flex flex-wrap items-center justify-between gap-2">
-              <p className="text-[14px] font-bold">Annotation</p>
+              <p className="text-[1rem] font-bold">Annotation</p>
               <button className="btn btn-secondary btn-sm" onClick={draftWithAI} disabled={busy === 'ai' || !s.abstract}>
                 {busy === 'ai' ? <Loader2 size={14} className="animate-spin" aria-hidden /> : <Sparkles size={14} aria-hidden />} Draft from abstract
               </button>
             </div>
-            {a.aiDrafted && <p className="rounded-lg bg-w1-soft px-2.5 py-1.5 text-[12.5px] text-w1-text">Parts of this annotation were drafted by AI from the abstract only. Check every statement against the full text.</p>}
+            {a.aiDrafted && <p className="rounded-lg bg-w1-soft px-2.5 py-1.5 text-[0.875rem] text-w1-text">Parts of this annotation were drafted by AI from the abstract only. Check every statement against the full text.</p>}
             <div className="grid gap-2.5 sm:grid-cols-2">
               {ann('level', 'Study type / level of evidence', false)}
               {ann('sample', 'Setting and sample', false)}
@@ -575,7 +575,7 @@ function SourceRow({ s, index, comparing, onCompare }: { s: SourceRecord; index:
               {ann('limitations', 'Limitations')}
             </div>
             {ann('relevance', 'Relevance to my question')}
-            <label className="flex min-h-[44px] items-center gap-2.5 rounded-lg border border-line px-3 text-[14px]">
+            <label className="flex min-h-[44px] items-center gap-2.5 rounded-lg border border-line px-3 text-[1rem]">
               <input type="checkbox" className="h-5 w-5 accent-[var(--btn-primary)]" checked={a.readFullText} onChange={(e) => set((x) => void (x.annotation.readFullText = e.target.checked))} />
               I opened and read this source myself
             </label>
@@ -601,11 +601,11 @@ function CompareTable({ ids, project, onClose }: { ids: string[]; project: Proje
   return (
     <section className="card mt-4 overflow-hidden" aria-labelledby="cmp-h">
       <div className="flex items-center justify-between border-b border-line px-4 py-2.5">
-        <h2 id="cmp-h" className="text-[16px] font-bold">Compare sources</h2>
+        <h2 id="cmp-h" className="text-[1.125rem] font-bold">Compare sources</h2>
         <button className="btn btn-ghost btn-sm" onClick={onClose}>Close</button>
       </div>
       <div className="overflow-x-auto">
-        <table className="w-full min-w-[560px] border-collapse text-[13.5px]">
+        <table className="w-full min-w-[560px] border-collapse text-[0.9375rem]">
           <thead>
             <tr>
               <th className="w-[120px]" />
