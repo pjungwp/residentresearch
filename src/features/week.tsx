@@ -147,10 +147,10 @@ export function WeekPage() {
           </div>
           {optional.length > 0 && (
             <div className="mt-4">
-              <button type="button" className="btn btn-ghost btn-sm" aria-expanded={more} onClick={() => setMore((m) => !m)}>
+              {core.length > 0 && <button type="button" className="btn btn-ghost btn-sm" aria-expanded={more} onClick={() => setMore((m) => !m)}>
                 {more ? <ChevronUp size={18} aria-hidden /> : <ChevronDown size={18} aria-hidden />} {more ? 'Fewer details' : `More details (${optional.length})`}
-              </button>
-              {more && (
+              </button>}
+              {(more || core.length === 0) && (
                 <div className="mt-3 grid gap-4 md:grid-cols-2">
                   {optional.map((f) => (
                     <div key={f.key} className={f.kind === 'long' ? 'md:col-span-2' : ''}>

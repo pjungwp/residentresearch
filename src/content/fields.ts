@@ -85,15 +85,15 @@ export const FIELDS: FieldDef[] = [
   { key: 'revisionNote', label: 'What changed and why', section: 'gap', week: 2, kind: 'long' },
 
   // Stage 3 · theory & conceptual framework
-  { key: 'theory', label: 'Guiding theory', section: 'theory', week: 3, kind: 'select', required: true,
+  { key: 'theory', label: 'Guiding theory or model', section: 'theory', week: 3, kind: 'select',
     options: ['Adult learning (Knowles)', 'Experiential learning (Kolb)', 'Cognitive load theory', 'Constructivism', 'Situated learning / communities of practice', 'Self-determination theory', 'Deliberate practice', 'Other', 'Not an education study (clinical model instead)'] },
-  { key: 'theoryWhy', label: 'Why this theory fits', section: 'theory', week: 3, kind: 'long', required: true, hint: '2–3 sentences linking the theory to your intervention.' },
-  { key: 'mechanism', label: 'How it should work (mechanism)', section: 'theory', week: 3, kind: 'long', required: true, hint: 'What changes in the learner, and why.' },
+  { key: 'theoryWhy', label: 'Why this theory fits', section: 'theory', week: 3, kind: 'long', hint: '2–3 sentences linking the theory to your intervention.' },
+  { key: 'mechanism', label: 'How it should work (mechanism)', section: 'theory', week: 3, kind: 'long', hint: 'What changes in the learner, and why.' },
   { key: 'logic.inputs', label: 'Logic model · Inputs', section: 'theory', week: 3, kind: 'long' },
   { key: 'logic.activities', label: 'Logic model · Activities', section: 'theory', week: 3, kind: 'long' },
   { key: 'logic.outputs', label: 'Logic model · Outputs', section: 'theory', week: 3, kind: 'long' },
   { key: 'logic.outcomes', label: 'Logic model · Outcomes (short → long term)', section: 'theory', week: 3, kind: 'long' },
-  { key: 'conceptualFramework', label: 'Conceptual framework (summary)', section: 'theory', week: 3, kind: 'long', required: true, hint: 'One paragraph or a described diagram.' },
+  { key: 'conceptualFramework', label: 'Conceptual framework (summary)', section: 'theory', week: 3, kind: 'long', hint: 'One paragraph or a described diagram.' },
 
   // Stage 4 · design
   { key: 'design', label: 'Study design', section: 'design', week: 4, kind: 'select', required: true,
@@ -201,10 +201,10 @@ export const WEEKS: WeekDef[] = [
     checkpoint: { id: 'w2', label: 'Question & evidence gap' }
   },
   {
-    n: 3, title: 'Choose a framework', short: 'Theory', tone: 'w3', steps: 'Stage 3',
-    goal: 'Why should your intervention work?',
-    instructions: ['Pick a guiding theory.', 'Explain the mechanism.', 'Sketch a logic model.'],
-    deliverable: 'Theory + conceptual framework',
+    n: 3, title: 'Framework (if relevant)', short: 'Framework', tone: 'w3', steps: 'Stage 3',
+    goal: 'Why should it work? Optional for many clinical studies.',
+    instructions: ['Education study: pick a learning theory.', 'Clinical study: name the mechanism or model.', 'Sketch a logic model (optional).'],
+    deliverable: 'Theory or mechanism (optional)',
     checklist: [{ id: 's3.link', text: 'Theory, intervention and outcome connect' }],
     actions: [
       { label: 'Match a theory', prompt: 'Suggest 2–3 learning theories that fit my intervention, with one sentence each on the mechanism and what it predicts. Cite only real, standard sources.' },

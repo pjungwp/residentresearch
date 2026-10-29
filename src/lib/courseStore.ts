@@ -95,7 +95,7 @@ export function assignmentStatus(s: CourseState, n: number): AssignmentStatus {
 export function missingRequired(s: CourseState, n: number): string[] {
   const def = COURSE[n - 1];
   const w = work(s, n);
-  return def.assignment.fields.filter((f) => f.required && !(w.values[f.key] ?? '').trim()).map((f) => f.label);
+  return def.assignment.fields.filter((f) => f.required && (!(w.values[f.key] ?? '').trim() || (w.values[f.key] ?? '').trim() === (f.starter ?? '').trim())).map((f) => f.label);
 }
 
 export function submit(n: number) {

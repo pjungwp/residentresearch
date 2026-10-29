@@ -4,7 +4,7 @@ import {
   ArrowLeft, ArrowRight, CheckCircle2, Circle, Compass, Download, ExternalLink, GraduationCap, Lightbulb, Mail, Maximize2, Pencil, Send, Sparkles, X, BookOpen, Upload, Loader2, AlertTriangle
 } from 'lucide-react';
 import { SimpleShell } from '@/components/shell';
-import { COURSE, COURSE_DESIGN, READINGS, RUNNING_CASE, type CourseWeek, type Slide, type AssignmentField } from '@/content/course';
+import { COURSE, COURSE_DESIGN, READINGS, RUNNING_CASE, RUNNING_NAME, type CourseWeek, type Slide, type AssignmentField } from '@/content/course';
 import { TONE_CLASSES } from '@/content/fields';
 import {
   useCourse, work, setValue, assignmentStatus, missingRequired, submit, reopen, assignmentText, bringToConcierge, updateCourse, exportCourseJson, importCourseJson, type CourseState
@@ -62,7 +62,7 @@ export function AcademyHome() {
     <SimpleShell>
       <div className="mx-auto max-w-[1100px] px-[var(--gutter)] py-6 sm:py-8">
         <p className="text-[1rem] font-bold uppercase tracking-[0.08em] text-teal">Research Design Academy</p>
-        <h1 className="mt-1 text-[2.125rem] leading-tight sm:text-[2.5rem]">Five weeks to a research proposal</h1>
+        <h1 className="mt-1 text-[2.125rem] leading-tight sm:text-[2.5rem]">Five weeks from idea to IRB draft</h1>
         <div className="mt-3 flex flex-wrap items-center gap-3">
           <Link to={`/academy/week/${next.n}`} className="btn btn-primary">{done ? 'Continue' : 'Start'} · Week {next.n} <ArrowRight size={20} aria-hidden /></Link>
           <span className="text-[1.125rem] text-slate">{done}/5 submitted</span>
@@ -88,7 +88,7 @@ export function AcademyHome() {
           })}
           <li className="rounded-[20px] border-2 border-dashed border-line-strong p-5">
             <span className="text-[1rem] font-bold uppercase tracking-[0.08em] text-slate">Running example</span>
-            <p className="mt-1 font-display text-[1.375rem] font-semibold leading-tight">SimPatient</p>
+            <p className="mt-1 font-display text-[1.375rem] font-semibold leading-tight">{RUNNING_NAME}</p>
             <p className="mt-2 text-[1.0625rem]">{RUNNING_CASE.split(': ')[1]}. It grows each week.</p>
           </li>
         </ol>
@@ -176,6 +176,40 @@ export function AcademyWeek() {
         </header>
 
         <SlideDeck week={w} />
+
+        <section className="mt-8" aria-labelledby="theory-h">
+          <h2 id="theory-h" className="text-[1.5rem]">Theory in 60 seconds</h2>
+          <ol className="mt-3 grid gap-3 sm:grid-cols-2">
+            {w.theory.map((x, k) => (
+              <li key={x.label} className="card flex gap-3 p-4">
+                <span className={`grid h-9 w-9 shrink-0 place-items-center rounded-full font-bold ${t.bg} text-ink`}>{k + 1}</span>
+                <span>
+                  <span className="block text-[1.1875rem] font-semibold">{x.label}</span>
+                  <span className="mt-0.5 block text-[1.0625rem]">{x.text}</span>
+                </span>
+              </li>
+            ))}
+          </ol>
+          <p className="mt-2 text-[0.9375rem] text-slate">
+            Based on:{' '}
+            {w.theoryCites.map((id, k) => (
+              <span key={id}>{k > 0 && ' · '}<a href={READINGS[id].url} target="_blank" rel="noopener noreferrer">{shortCite(id)}</a></span>
+            ))}
+          </p>
+          {w.eduBox && (
+            <details className="mt-4 rounded-2xl border-2 border-dashed border-line-strong bg-surface p-4">
+              <summary className="cursor-pointer text-[1.1875rem] font-semibold">{w.eduBox.title} (optional)</summary>
+              <ul className="mt-2 space-y-2 text-[1.0625rem]">
+                {w.eduBox.points.map((x) => <li key={x} className="flex gap-2.5"><span className={`mt-2.5 h-2 w-2 shrink-0 rounded-full ${t.bg}`} aria-hidden />{x}</li>)}
+              </ul>
+              <p className="mt-2 text-[0.9375rem] text-slate">
+                {w.eduBox.cites.map((id, k) => (
+                  <span key={id}>{k > 0 && ' · '}<a href={READINGS[id].url} target="_blank" rel="noopener noreferrer">{shortCite(id)}</a></span>
+                ))}
+              </p>
+            </details>
+          )}
+        </section>
 
         <section className="mt-8 grid gap-4 md:grid-cols-2" aria-label="Key ideas">
           <div className="card p-5">
@@ -372,7 +406,7 @@ function SlideView({ slide, week, index, large }: { slide: Slide; week: CourseWe
     case 'case':
       body = (
         <div className="mt-4">
-          <p className={`font-semibold ${labelText}`}>SimPatient</p>
+          <p className={`font-semibold ${labelText}`}>{RUNNING_NAME}</p>
           <p className={`text-slate ${itemText}`}>{slide.text.split(': ')[1]}</p>
           <ul className="mt-4 space-y-2.5">
             {slide.points.map((x) => (
@@ -489,6 +523,12 @@ function AssignmentPanel({ week, course }: { week: CourseWeek; course: CourseSta
         ))}
       </ol>
       <p className="mt-3 text-[1.125rem]"><strong>You’ll hand in:</strong> {week.assignment.output}</p>
+      <ul className="mt-2 flex flex-wrap gap-2 text-[1rem] font-semibold" aria-label="Logistics">
+        <li className="rounded-full bg-surface px-3 py-1">Due Wednesday morning</li>
+        <li className="rounded-full bg-surface px-3 py-1">About {week.assignment.minutes} min</li>
+        <li className="rounded-full bg-surface px-3 py-1">Formative · feedback by Wednesday afternoon</li>
+      </ul>
+      <p className="mt-2 text-[1rem] text-slate">Tip: tap <strong>Use starter</strong> to drop in a fill-in-the-blank sentence.</p>
 
       <div className="mt-5 grid gap-4 md:grid-cols-2">
         {week.assignment.fields.map((f) => (
@@ -561,6 +601,11 @@ function AssignmentInput({ n, f, value, locked, wide }: { n: number; f: Assignme
       </div>
       {f.hint && <span className="field-hint">{f.hint}</span>}
       {ex && f.example && <p className="mt-1 rounded-xl bg-surface-2 px-3 py-2 text-[1rem] italic">{f.example}</p>}
+      {f.starter && !locked && !value.trim() && (
+        <button type="button" className="mt-1.5 inline-flex min-h-[40px] items-center gap-1.5 rounded-full border border-line-strong bg-surface px-3 text-[0.9375rem] font-semibold text-teal hover:bg-sage" onClick={() => setValue(n, f.key, f.starter!)}>
+          <Pencil size={15} aria-hidden /> Use starter
+        </button>
+      )}
       {f.kind === 'select' ? (
         <select id={id} className="input mt-1.5" value={value} disabled={locked} onChange={(e) => setValue(n, f.key, e.target.value)}>
           <option value="">Choose…</option>
@@ -570,6 +615,15 @@ function AssignmentInput({ n, f, value, locked, wide }: { n: number; f: Assignme
         <textarea id={id} className="input mt-1.5 min-h-[120px] text-[1.0625rem]" value={value} readOnly={locked} onChange={(e) => setValue(n, f.key, e.target.value)} />
       ) : (
         <input id={id} className="input mt-1.5" value={value} readOnly={locked} onChange={(e) => setValue(n, f.key, e.target.value)} />
+      )}
+      {f.key === 'search' && value.trim() && (
+        <div className="mt-2 flex flex-wrap gap-2">
+          <a className="btn btn-secondary btn-sm" href={`https://pubmed.ncbi.nlm.nih.gov/?term=${encodeURIComponent(value.trim())}`} target="_blank" rel="noopener noreferrer">Run in PubMed <ExternalLink size={15} aria-hidden /></a>
+          <a className="btn btn-ghost btn-sm" href={`https://pubmed.ncbi.nlm.nih.gov/?term=${encodeURIComponent(value.trim())}&filter=pubt.guideline&filter=pubt.systematicreview`} target="_blank" rel="noopener noreferrer">Guidelines & reviews only <ExternalLink size={15} aria-hidden /></a>
+        </div>
+      )}
+      {f.key.startsWith('source') && (f.key === 'source1') && (
+        <p className="mt-1.5 text-[0.9375rem] text-slate">Check each reference exists (PubMed or DOI) and that you read it. The free Concierge’s Evidence Library can verify them for you.</p>
       )}
     </div>
   );

@@ -51,6 +51,13 @@ export const READINGS: Record<string, Reading> = {
   glassick: { id: 'glassick', cite: "Glassick CE. Boyer's expanded definitions of scholarship, the standards for assessing scholarship, and the elusiveness of the scholarship of teaching. Acad Med. 2000;75(9):877-880.", url: 'https://doi.org/10.1097/00001888-200009000-00007', why: 'Six standards for scholarly work.' },
   biggs: { id: 'biggs', cite: 'Biggs J. Enhancing teaching through constructive alignment. High Educ. 1996;32(3):347-364.', url: 'https://doi.org/10.1007/BF00138871', why: 'Align outcomes, activities, assessment.' },
   hattie: { id: 'hattie', cite: 'Hattie J, Timperley H. The power of feedback. Rev Educ Res. 2007;77(1):81-112.', url: 'https://doi.org/10.3102/003465430298487', why: 'Feed up, feed back, feed forward.' },
+  grimes: { id: 'grimes', cite: 'Grimes DA, Schulz KF. An overview of clinical research: the lay of the land. Lancet. 2002;359(9300):57-61.', url: 'https://doi.org/10.1016/S0140-6736(02)07283-5', why: 'One-page map of clinical study designs.' },
+  grade: { id: 'grade', cite: 'Guyatt GH, Oxman AD, Vist GE, et al. GRADE: an emerging consensus on rating quality of evidence and strength of recommendations. BMJ. 2008;336(7650):924-926.', url: 'https://pubmed.ncbi.nlm.nih.gov/18436948/', why: 'How certainty of evidence is rated.' },
+  sambunjak: { id: 'sambunjak', cite: 'Sambunjak D, Straus SE, Marusić A. Mentoring in academic medicine: a systematic review. JAMA. 2006;296(9):1103-1115.', url: 'https://doi.org/10.1001/jama.296.9.1103', why: 'What mentoring does for trainee research.' },
+  strobe: { id: 'strobe', cite: 'von Elm E, Altman DG, Egger M, et al. The Strengthening the Reporting of Observational Studies in Epidemiology (STROBE) statement: guidelines for reporting observational studies. Lancet. 2007;370(9596):1453-1457.', url: 'https://doi.org/10.1016/S0140-6736(07)61602-X', why: 'Reporting checklist for observational studies.' },
+  pubmedHelp: { id: 'pubmedHelp', cite: 'National Library of Medicine. PubMed User Guide.', url: 'https://pubmed.ncbi.nlm.nih.gov/help/', why: 'MeSH, filters and search tips.' },
+  ohrp: { id: 'ohrp', cite: 'HHS Office for Human Research Protections. Human research protection training (free).', url: 'https://www.hhs.gov/ohrp/education-and-outreach/human-research-protection-training/index.html', why: 'Free option if your IRB accepts it.' },
+  icmje: { id: 'icmje', cite: 'International Committee of Medical Journal Editors. Recommendations (authorship criteria).', url: 'https://www.icmje.org/recommendations/', why: 'Who qualifies as an author.' },
   citi: { id: 'citi', cite: 'CITI Program. Human subjects research training.', url: 'https://about.citiprogram.org/', why: 'Training most IRBs require.' }
 };
 
@@ -74,6 +81,8 @@ export interface AssignmentField {
   kind?: 'text' | 'long' | 'select';
   options?: string[];
   required?: boolean;
+  /** fill-in-the-blank sentence frame (inserted on request) */
+  starter?: string;
   /** Concierge field to fill when transferring */
   concierge?: string;
 }
@@ -87,210 +96,247 @@ export interface CourseWeek {
   promise: string;
   frameworks: string[];
   slides: Slide[];
+  /** quick theory review */
+  theory: { label: string; text: string }[];
+  theoryCites: string[];
   keyIdeas: string[];
   practice: { tip: string; cite: string }[];
-  assignment: { title: string; steps: string[]; output: string; fields: AssignmentField[] };
+  /** optional box for education-research projects */
+  eduBox?: { title: string; points: string[]; cites: string[] };
+  assignment: { title: string; steps: string[]; output: string; minutes: number; fields: AssignmentField[] };
   readings: string[];
 }
 
-const KIRK = ['Kirkpatrick 1 · Reaction', 'Kirkpatrick 2 · Learning (knows / knows how)', 'Kirkpatrick 2 · Skills (shows how)', 'Kirkpatrick 3 · Behavior (does)', 'Kirkpatrick 4 · Results / patient outcomes'];
-const THEORIES = ['Adult learning (Knowles)', 'Experiential learning (Kolb)', 'Cognitive load theory', 'Constructivism', 'Situated learning / communities of practice', 'Self-determination theory', 'Deliberate practice', 'Other'];
 
-export const RUNNING_CASE = 'SimPatient: AI-simulated patient encounters with rubric feedback for third-year clerkship students';
+export const RUNNING_NAME = 'BP Check';
+export const RUNNING_CASE = 'BP Check: do text-message reminders get more postpartum patients with hypertension a blood-pressure check within 10 days of discharge?';
 
 export const COURSE: CourseWeek[] = [
   {
-    n: 1, tone: 'w1', title: 'From problem to research question', short: 'Question',
-    promise: 'Turn a teaching problem into one sharp question.',
-    frameworks: ['Problem → gap → hook', 'FINER', 'PICO(T)', 'Kirkpatrick levels'],
+    n: 1, tone: 'w1', title: 'Research story & question', short: 'Question',
+    promise: 'Turn something you noticed into one answerable question.',
+    frameworks: ['Once upon a time story', 'PICOT', 'PEO / SPIDER (qualitative)', 'FINER'],
+    theory: [
+      { label: 'Start with a story', text: 'A story makes the problem, the gap and why it matters visible before you lock in wording.' },
+      { label: 'Problem → gap → hook', text: 'What is wrong, what we don’t know, and why it matters now.' },
+      { label: 'Structure the question', text: 'PICOT for comparisons; PEO or SPIDER for experiences. Each element later becomes a design choice.' },
+      { label: 'Test it with FINER', text: 'Feasible, Interesting, Novel, Ethical, Relevant — the classic screen for a good question.' }
+    ],
+    theoryCites: ['lingard', 'hulley', 'cookPurpose'],
     slides: [
-      { kind: 'steps', title: 'What makes it researchable?', items: [{ label: 'Problem', text: 'Something real is not working' }, { label: 'Gap', text: 'We don’t know the answer' }, { label: 'Hook', text: 'Why it matters now' }, { label: 'Question', text: 'One answerable sentence' }], caption: 'Lingard 2015' },
-      { kind: 'compare', title: 'Problem ≠ question', left: { label: 'Problem', items: ['Students struggle with hard conversations', 'Too few practice chances'] }, right: { label: 'Question', items: ['Does practice with AI-simulated patients improve communication scores vs usual teaching?'] } },
+      { kind: 'steps', title: 'Once upon a time…', items: [{ label: 'We believed', text: 'Current practice' }, { label: 'I wondered', text: 'What bothered you' }, { label: 'I propose', text: 'What you’ll study' }, { label: 'I anticipate', text: 'Your best guess' }, { label: 'This will change', text: 'Why it matters' }] },
+      { kind: 'compare', title: 'Problem ≠ question', left: { label: 'Problem', items: ['Many postpartum patients miss BP checks'] }, right: { label: 'Question', items: ['Do text reminders increase BP checks within 10 days vs usual care?'] } },
+      { kind: 'cards', title: 'PICOT', items: [{ label: 'P', text: 'Postpartum patients with hypertension' }, { label: 'I', text: 'Text reminders' }, { label: 'C', text: 'Usual discharge instructions' }, { label: 'O', text: 'BP check done' }, { label: 'T', text: 'Within 10 days' }] },
+      { kind: 'compare', title: 'Not every question is PICOT', left: { label: 'Quantitative', items: ['Does it work?', 'How much?', 'PICOT'] }, right: { label: 'Qualitative', items: ['Why? How? What is it like?', 'PEO or SPIDER'] } },
       { kind: 'steps', title: 'FINER', items: [{ label: 'F', text: 'Feasible' }, { label: 'I', text: 'Interesting' }, { label: 'N', text: 'Novel' }, { label: 'E', text: 'Ethical' }, { label: 'R', text: 'Relevant' }], caption: 'Browner et al., Designing Clinical Research' },
-      { kind: 'pyramid', title: 'Choose outcomes that matter', items: [{ label: '4 · Results', text: 'Patients, systems' }, { label: '3 · Behavior', text: 'Changed practice' }, { label: '2 · Learning', text: 'Knowledge, skills' }, { label: '1 · Reaction', text: 'Satisfaction' }], caption: 'Higher = more meaningful, harder to measure (Kirkpatrick; Yardley & Dornan 2012)' },
-      { kind: 'compare', title: 'Weak vs strong question', left: { label: 'Weak', items: ['Do students like simulation?', 'Is AI good for teaching?'] }, right: { label: 'Strong', items: ['In third-year clerkship students, do 3 AI-simulated encounters with rubric feedback improve OSCE communication scores vs usual teaching over 6 weeks?'] } },
-      { kind: 'case', title: 'Running example', text: RUNNING_CASE, points: ['Problem: few safe chances to practice', 'Gap: little evidence AI patients improve skills', 'Question: does SimPatient raise OSCE communication scores?'] },
-      { kind: 'check', title: 'Quick check', question: 'Which is the strongest research question?', options: [
-        { text: 'Do residents enjoy the new curriculum?', why: 'Reaction only, and no comparison.' },
-        { text: 'In PGY-1s, does weekly feedback coaching improve milestone ratings vs usual feedback over 6 months?', correct: true, why: 'Population, intervention, comparator, outcome and time are all named.' },
-        { text: 'How can we improve resident education?', why: 'Too broad to answer.' }
+      { kind: 'case', title: 'Running example', text: RUNNING_CASE, points: ['Story: patients readmitted with severe BP', 'Question: PICOT above', 'FINER: feasible — EHR data, one hospital'] },
+      { kind: 'check', title: 'Quick check', question: 'Which question is ready to study?', options: [
+        { text: 'How can we improve postpartum care?', why: 'Too broad to answer.' },
+        { text: 'Do text reminders increase 10-day BP checks vs usual care in postpartum patients with hypertension?', correct: true, why: 'Every PICOT element is named and measurable.' },
+        { text: 'Do patients like text messages?', why: 'Measures preference, not the outcome that matters.' }
       ] }
     ],
-    keyIdeas: ['A problem is what bothers you; a question is what you can answer.', 'Name the gap in one sentence before you design anything.', 'Pick the highest outcome level you can measure well.', 'Aim to explain why, not only whether (clarification research).'],
-    practice: [{ tip: 'Write the question first, then check FINER with a mentor.', cite: 'hulley' }, { tip: 'Use problem–gap–hook to frame your introduction.', cite: 'lingard' }],
+    keyIdeas: ['Write the story first; the question comes out of it.', 'Name every PICOT (or PEO) element.', 'Choose an outcome you can actually get data for.', 'Keep 1–2 backup questions.'],
+    practice: [{ tip: 'Check FINER with a mentor before investing time.', cite: 'hulley' }, { tip: 'Glance at the literature now — 2 minutes can reshape your question (see Week 2).', cite: 'maggio' }],
     assignment: {
-      title: 'Research question and rationale',
-      steps: ['Describe the problem.', 'Name the gap and purpose.', 'Write one question and check FINER.'],
-      output: '1 page: problem, gap, purpose, question.',
+      title: 'Research story and question',
+      steps: ['Fill in the 5-line story.', 'Write one PICOT (or PEO) question.', 'Run a FINER check.'],
+      output: 'A 5-line story, one question, a FINER line.',
+      minutes: 30,
       fields: [
-        { key: 'problem', label: 'Problem statement', kind: 'long', required: true, hint: '2–3 sentences: what, who, why it matters.', example: 'Clerkship students get few supervised chances to practice difficult conversations, and OSCE communication scores lag.', concierge: 'problem' },
-        { key: 'gap', label: 'Evidence gap', kind: 'long', required: true, hint: 'What is known, what is missing.', example: 'Simulation helps, but whether AI-simulated patients improve observed skills is unclear.', concierge: 'gap' },
-        { key: 'purpose', label: 'Study purpose', kind: 'long', required: true, hint: 'The purpose of this study is to…', example: 'To test whether AI-simulated encounters with rubric feedback improve communication skills.', concierge: 'purpose' },
-        { key: 'question', label: 'Research question', kind: 'long', required: true, hint: 'One sentence. Name population, intervention, comparison, outcome.', example: 'In third-year clerkship students, do three AI-simulated encounters with rubric feedback improve OSCE communication scores compared with usual teaching?', concierge: 'question' },
-        { key: 'outcomeLevel', label: 'Outcome level', kind: 'select', options: KIRK, required: true, concierge: 'outcomeLevel' },
-        { key: 'finer.f', label: 'Feasible?', kind: 'text', required: true, example: 'Yes — 30 students per block; existing OSCE.', concierge: 'finer.f' },
-        { key: 'finer.i', label: 'Interesting?', kind: 'text', concierge: 'finer.i' },
-        { key: 'finer.n', label: 'Novel?', kind: 'text', concierge: 'finer.n' },
-        { key: 'finer.e', label: 'Ethical?', kind: 'text', concierge: 'finer.e' },
-        { key: 'finer.r', label: 'Relevant?', kind: 'text', concierge: 'finer.r' }
+        { key: 'story.believed', label: 'Once upon a time, we believed…', kind: 'long', required: true, starter: 'Once upon a time, we believed that ', example: '…giving postpartum patients written BP instructions was enough.', concierge: 'story.believed' },
+        { key: 'story.wondered', label: 'But I wondered whether…', kind: 'long', required: true, starter: 'But I wondered whether ', example: '…many never get their BP checked after discharge.', concierge: 'story.wondered' },
+        { key: 'story.propose', label: 'So I propose to investigate…', kind: 'long', required: true, starter: 'So I propose to investigate ', example: '…whether text reminders increase BP checks within 10 days.', concierge: 'story.propose' },
+        { key: 'story.anticipate', label: 'I anticipate discovering…', kind: 'long', starter: 'I anticipate discovering that ', example: '…more patients get checked with reminders.', concierge: 'story.anticipate' },
+        { key: 'story.change', label: 'And hopefully this will change…', kind: 'long', starter: 'And hopefully this will change ', example: '…our discharge workflow and reduce readmissions.', concierge: 'story.change' },
+        { key: 'framework', label: 'Question type', kind: 'select', options: ['PICOT', 'PEO', 'SPIDER'], required: true, concierge: 'framework' },
+        { key: 'question', label: 'Research question', kind: 'long', required: true, hint: 'One sentence.', starter: 'In [population], does [intervention] compared with [comparison] change [outcome] within [time]?', example: 'In postpartum patients with hypertension, do text reminders compared with usual instructions increase BP checks within 10 days of discharge?', concierge: 'question' },
+        { key: 'finer', label: 'FINER check', kind: 'long', required: true, starter: 'F: \nI: \nN: \nE: \nR: ', example: 'F: EHR data, ~200 patients/yr · I: department priority · N: few local data · E: minimal risk · R: guidelines call for early postpartum BP checks' },
+        { key: 'backups', label: 'Backup question (optional)', kind: 'long', concierge: 'backups' }
       ]
     },
-    readings: ['lingard', 'hulley', 'cookPurpose', 'yardley', 'maggio', 'bordageDawson']
+    readings: ['lingard', 'hulley', 'cookPurpose', 'bordageDawson']
   },
   {
-    n: 2, tone: 'w2', title: 'Learning theory & conceptual frameworks', short: 'Theory',
-    promise: 'Explain why your intervention should work.',
-    frameworks: ['Adult learning', 'Kolb', 'Cognitive load', 'Constructivism', 'Situated learning', 'Self-determination', 'Logic model'],
+    n: 2, tone: 'w2', title: 'Literature search & evidence gap', short: 'Literature',
+    promise: 'Find what is known, name the gap, sharpen the question.',
+    frameworks: ['Concepts → keywords → MeSH', 'Boolean AND / OR', 'Evidence hierarchy', 'Annotated bibliography'],
+    theory: [
+      { label: 'Search is a method', text: 'Turn each PICOT element into a concept, list synonyms and MeSH terms, combine with OR inside and AND between.' },
+      { label: 'Not all evidence is equal', text: 'Guidelines and systematic reviews first; then trials and cohorts. GRADE rates how certain the evidence is.' },
+      { label: 'Read to find the gap', text: 'A gap is what the best evidence still can’t answer — for your population, setting or outcome.' },
+      { label: 'Verify every citation', text: 'AI tools can invent references. Confirm each one in PubMed or by DOI and read it yourself.' }
+    ],
+    theoryCites: ['maggio', 'grade', 'pubmedHelp'],
     slides: [
-      { kind: 'big', title: 'Why theory?', statement: 'Theory tells you why it should work — and what to measure.', caption: 'Frameworks illuminate and magnify (Bordage 2009)' },
-      { kind: 'cards', title: 'Six theories', items: [
-        { label: 'Adult learning', text: 'Relevance, self-direction' },
-        { label: 'Experiential (Kolb)', text: 'Do → reflect → try again' },
-        { label: 'Cognitive load', text: 'Working memory is limited' },
-        { label: 'Constructivism', text: 'Build on prior knowledge' },
-        { label: 'Situated learning', text: 'Learn by joining the team' },
-        { label: 'Self-determination', text: 'Autonomy, competence, relatedness' }
-      ] },
-      { kind: 'table', title: 'Match theory to intervention', columns: ['Intervention', 'Theory', 'Predicts'], rows: [
-        ['Simulation + debrief', 'Kolb', 'Reflection improves performance'],
-        ['Worked examples', 'Cognitive load', 'Less overload, faster skill'],
-        ['Learner-chosen goals', 'Self-determination', 'More motivation'],
-        ['Team-based clinic roles', 'Situated learning', 'Stronger professional identity']
-      ] },
-      { kind: 'steps', title: 'Logic model', items: [{ label: 'Inputs', text: 'People, time, tools' }, { label: 'Activities', text: 'What you do' }, { label: 'Outputs', text: 'What you count' }, { label: 'Outcomes', text: 'What changes' }], caption: 'Frye & Hemmer 2012' },
-      { kind: 'compare', title: 'Three terms', left: { label: 'Theory / theoretical framework', items: ['A tested explanation', 'One theory guides the study'] }, right: { label: 'Conceptual framework', items: ['Your argument', 'How problem, theory, design and outcomes connect'] }, caption: 'Varpio et al. 2020' },
-      { kind: 'case', title: 'Running example', text: RUNNING_CASE, points: ['Theory: Kolb experiential learning', 'Mechanism: practice + rubric feedback + reflection', 'Outcome: observed communication skill'] },
-      { kind: 'check', title: 'Quick check', question: 'Your intervention breaks a complex skill into worked examples. Which theory fits best?', options: [
-        { text: 'Cognitive load theory', correct: true, why: 'Worked examples reduce extraneous load on working memory.' },
-        { text: 'Situated learning', why: 'That is about learning inside a community of practice.' },
-        { text: 'Self-determination theory', why: 'That is about motivation.' }
+      { kind: 'steps', title: 'From question to search', items: [{ label: 'Concepts', text: 'One per PICOT element' }, { label: 'Synonyms', text: 'Plus MeSH terms' }, { label: 'Combine', text: 'OR inside, AND between' }, { label: 'Log it', text: 'Date, database, hits' }] },
+      { kind: 'table', title: 'Search string example', columns: ['Concept', 'Terms'], rows: [['Postpartum', 'postpartum OR puerperium OR Postpartum Period[mh]'], ['Hypertension', 'hypertension OR preeclampsia OR Hypertension, Pregnancy-Induced[mh]'], ['Reminders', 'text message* OR SMS OR Reminder Systems[mh]']], caption: 'PubMed User Guide' },
+      { kind: 'pyramid', title: 'Where to look first', items: [{ label: 'Guidelines', text: 'ACOG, USPSTF' }, { label: 'Systematic reviews', text: 'Cochrane' }, { label: 'Trials & cohorts', text: 'Primary studies' }, { label: 'Opinion & case reports', text: 'Least certain' }], caption: 'Certainty rated with GRADE (Guyatt et al. 2008)' },
+      { kind: 'cards', title: 'Annotate each source', items: [{ label: 'What they did', text: 'Design, sample' }, { label: 'What they found', text: 'One line' }, { label: 'Limitation', text: 'Always one' }, { label: 'Why it matters', text: 'For your question' }] },
+      { kind: 'compare', title: 'Gap → better question', left: { label: 'Before', items: ['Do reminders help postpartum BP follow-up?'] }, right: { label: 'After reading (hypothetical)', items: ['Say most trials used home BP cuffs, not texts alone.', 'New focus: texts alone, in our clinic.'] } },
+      { kind: 'case', title: 'Running example', text: RUNNING_CASE, points: ['4 key sources: 1 guideline, 1 review, 2 trials', 'Gap: texts alone, safety-net population', 'Question narrowed to our clinic'] },
+      { kind: 'check', title: 'Quick check', question: 'An AI tool gives you a perfect-looking reference. What next?', options: [
+        { text: 'Cite it — the formatting is correct.', why: 'Formatting proves nothing; references can be invented.' },
+        { text: 'Find it in PubMed or by DOI and read it before citing.', correct: true, why: 'Verify existence and content yourself.' },
+        { text: 'Ask the AI if it is real.', why: 'The same tool can confidently confirm a fake.' }
       ] }
     ],
-    keyIdeas: ['Choose one main theory; say what it predicts.', 'The mechanism links your intervention to your outcome.', 'A logic model makes assumptions visible.', 'A framework also hides things — name what it leaves out.'],
-    practice: [{ tip: 'Design so outcomes, activities and assessment align.', cite: 'biggs' }, { tip: 'Build feedback into the intervention: where am I going, how am I doing, what next?', cite: 'hattie' }],
+    keyIdeas: ['Search systematically and keep a log.', 'Start with guidelines and reviews.', 'Annotate: what, found, limitation, relevance.', 'Let the gap reshape your question.'],
+    practice: [{ tip: 'Build the literature review to argue a gap, not to list papers.', cite: 'maggio' }, { tip: 'Ask a medical librarian — it’s free and fast.', cite: 'pubmedHelp' }],
     assignment: {
-      title: 'Theory-informed intervention model',
-      steps: ['Pick a theory and justify it.', 'Explain the mechanism.', 'Fill in the logic model.'],
-      output: 'Theory + logic model + one-paragraph framework.',
+      title: 'Mini literature review',
+      steps: ['Run one logged PubMed search.', 'Annotate 3–5 key sources.', 'State the gap and revise the question.'],
+      output: 'Search string, 3–5 annotations, gap, revised question.',
+      minutes: 30,
       fields: [
-        { key: 'theory', label: 'Guiding theory', kind: 'select', options: THEORIES, required: true, concierge: 'theory' },
-        { key: 'theoryWhy', label: 'Why it fits', kind: 'long', required: true, hint: '2–3 sentences.', example: 'Kolb: students practice, get feedback, reflect, and try again — the cycle the intervention builds in.', concierge: 'theoryWhy' },
-        { key: 'mechanism', label: 'Mechanism', kind: 'long', required: true, hint: 'What changes in the learner?', example: 'Repeated practice with specific feedback sharpens communication behaviors.', concierge: 'mechanism' },
-        { key: 'logic.inputs', label: 'Inputs', kind: 'long', example: 'AI platform, rubric, faculty time, 30 students.', concierge: 'logic.inputs' },
-        { key: 'logic.activities', label: 'Activities', kind: 'long', example: 'Three 20-minute encounters with rubric feedback.', concierge: 'logic.activities' },
-        { key: 'logic.outputs', label: 'Outputs', kind: 'long', example: 'Encounters completed, feedback reports.', concierge: 'logic.outputs' },
-        { key: 'logic.outcomes', label: 'Outcomes', kind: 'long', example: 'Short: rubric scores. Long: OSCE communication.', concierge: 'logic.outcomes' },
-        { key: 'conceptualFramework', label: 'Conceptual framework', kind: 'long', required: true, hint: 'One paragraph tying it together.', concierge: 'conceptualFramework' }
+        { key: 'search', label: 'PubMed search string', kind: 'long', required: true, hint: 'Use the button below to run it.', starter: '(concept 1 terms) AND (concept 2 terms) AND (concept 3 terms)', example: '(postpartum OR puerperium) AND (hypertension OR preeclampsia) AND ("text message*" OR SMS)' },
+        { key: 'searchLog', label: 'Search log', kind: 'text', starter: 'Date: · Database: PubMed · Hits: · Kept: ', example: 'Oct 30 · PubMed · 84 hits · 5 kept' },
+        { key: 'source1', label: 'Source 1', kind: 'long', required: true, starter: 'Citation + DOI/PMID: \nWhat they did: \nFound: \nLimitation: \nWhy it matters: ', example: 'Author, year (PMID) · RCT, n=… · texting increased BP checks · single center · supports our intervention' },
+        { key: 'source2', label: 'Source 2', kind: 'long', required: true, starter: 'Citation + DOI/PMID: \nWhat they did: \nFound: \nLimitation: \nWhy it matters: ' },
+        { key: 'source3', label: 'Source 3', kind: 'long', required: true, starter: 'Citation + DOI/PMID: \nWhat they did: \nFound: \nLimitation: \nWhy it matters: ' },
+        { key: 'source4', label: 'Source 4 (optional)', kind: 'long', starter: 'Citation + DOI/PMID: \nWhat they did: \nFound: \nLimitation: \nWhy it matters: ' },
+        { key: 'source5', label: 'Source 5 (optional)', kind: 'long', starter: 'Citation + DOI/PMID: \nWhat they did: \nFound: \nLimitation: \nWhy it matters: ' },
+        { key: 'gap', label: 'Evidence gap', kind: 'long', required: true, starter: 'We know that … but we do not know whether … in … .', concierge: 'gap' },
+        { key: 'revisedQuestion', label: 'Revised question (or why it stays)', kind: 'long', required: true, concierge: 'revisedQuestion' }
       ]
     },
-    readings: ['varpio', 'bordage2009', 'taylorHamdy', 'knowles', 'kolb', 'sweller', 'lave', 'ryanDeci', 'frye']
+    readings: ['maggio', 'grade', 'pubmedHelp', 'lingard']
   },
   {
-    n: 3, tone: 'w3', title: 'Selecting the research design', short: 'Design',
-    promise: 'Pick the simplest design that answers your question.',
-    frameworks: ['Quantitative', 'Qualitative', 'Mixed methods', 'Experimental / quasi-experimental', 'Design-based research'],
+    n: 3, tone: 'w3', title: 'Study design, measures & analysis', short: 'Design',
+    promise: 'Pick the simplest design that answers your question — and plan the analysis now.',
+    frameworks: ['Design hierarchy', 'Bias & confounding', 'Validity & reliability', 'Effect size'],
+    theory: [
+      { label: 'The question picks the design', text: 'Descriptive → survey or chart review. Association → cohort, case-control. Does it work? → trial or controlled pre/post. Why/how? → qualitative.' },
+      { label: 'Three rivals to any result', text: 'Chance, bias and confounding. Good design limits each.' },
+      { label: 'Measure well', text: 'Use a validated instrument when one exists; define the outcome exactly.' },
+      { label: 'Plan analysis first', text: 'Match each outcome to an analysis; report effect size and confidence intervals, not just P.' }
+    ],
+    theoryCites: ['grimes', 'hulley', 'sullivanFeinn'],
+    eduBox: {
+      title: 'If your study is about teaching or learning',
+      points: ['Name a learning theory that explains why it should work (e.g., Kolb’s experiential learning, cognitive load theory).', 'Aim above satisfaction: Kirkpatrick levels and Miller’s pyramid.', 'Gather validity evidence for rubrics and surveys.'],
+      cites: ['varpio', 'taylorHamdy', 'yardley', 'miller', 'cookBeckman', 'ringsted']
+    },
     slides: [
-      { kind: 'table', title: 'Match design to question', columns: ['You ask…', 'Use…'], rows: [['Does it work?', 'Randomized, crossover, controlled pre/post'], ['How or why?', 'Interviews, focus groups'], ['Both?', 'Mixed methods'], ['How common? Related?', 'Survey, cohort']] },
-      { kind: 'cards', title: 'Quantitative designs', items: [{ label: 'Single-group pre/post', text: 'Easy; weakest causal claim' }, { label: 'Controlled pre/post', text: 'Adds a comparison group' }, { label: 'Randomized', text: 'Strongest causal claim' }, { label: 'Crossover', text: 'Each group gets both; watch carryover' }] },
-      { kind: 'cards', title: 'Qualitative inquiry', items: [{ label: 'Interviews', text: 'Depth, individual views' }, { label: 'Focus groups', text: 'Shared views, interaction' }, { label: 'Purposive sampling', text: 'Choose information-rich people' }, { label: 'Enough data', text: 'Information power, not a fixed n' }], caption: 'Kuper et al. 2008; Malterud et al. 2016' },
-      { kind: 'steps', title: 'Mixed-methods designs', items: [{ label: 'Convergent', text: 'Collect both, compare' }, { label: 'Explanatory', text: 'Numbers first, then explain' }, { label: 'Exploratory', text: 'Explore first, then measure' }], caption: 'Creswell & Plano Clark 2018' },
-      { kind: 'cards', title: 'Watch for', items: [{ label: 'Bias', text: 'Selection, contamination' }, { label: 'Confounding', text: 'Other things that changed' }, { label: 'Feasibility', text: 'Time, numbers, access' }, { label: 'Ethics', text: 'Learners must feel free to say no' }] },
-      { kind: 'case', title: 'Running example', text: RUNNING_CASE, points: ['Design: crossover across two clerkship blocks', 'Comparator: usual teaching', 'Add: brief interviews on how feedback was used'] },
-      { kind: 'check', title: 'Quick check', question: 'You want to know why residents ignore feedback. Best design?', options: [
-        { text: 'Randomized trial', why: 'Tests whether, not why.' },
-        { text: 'Qualitative interviews', correct: true, why: '“Why” questions need qualitative depth.' },
-        { text: 'Single-group pre/post', why: 'Measures change, not reasons.' }
+      { kind: 'table', title: 'Match design to question', columns: ['You ask…', 'Design'], rows: [['How common?', 'Survey, chart review'], ['What is linked to it?', 'Cohort, case-control'], ['Does it work?', 'Randomized, controlled pre/post'], ['Why? How?', 'Interviews, focus groups']], caption: 'Grimes & Schulz 2002' },
+      { kind: 'cards', title: 'Three rivals', items: [{ label: 'Chance', text: 'Too few patients' }, { label: 'Bias', text: 'Who got in, how measured' }, { label: 'Confounding', text: 'Something else explains it' }] },
+      { kind: 'compare', title: 'Define the outcome exactly', left: { label: 'Vague', items: ['“BP follow-up”'] }, right: { label: 'Exact', items: ['Any documented BP reading 3–10 days after discharge, from the EHR'] } },
+      { kind: 'table', title: 'Match analysis to outcome', columns: ['Outcome', 'Common analysis'], rows: [['Yes/no, two groups', 'Chi-square; risk difference'], ['Number, two groups', 't-test or Mann-Whitney'], ['Adjusting for confounders', 'Regression'], ['Interview text', 'Thematic analysis']], caption: 'Ask a biostatistician early' },
+      { kind: 'cards', title: 'Surveys that work', items: [{ label: 'Use a validated one', text: 'If it exists, cite it' }, { label: 'Else: 7 steps', text: 'Review, interview, draft, expert review, pilot' }, { label: 'Likert data', text: 'Analyze thoughtfully' }], caption: 'Artino et al. 2014; Sullivan & Artino 2013' },
+      { kind: 'case', title: 'Running example', text: RUNNING_CASE, points: ['Design: pre/post with historical control', 'Outcome: documented BP 3–10 days', 'Analysis: risk difference + 95% CI, adjust for parity, race, insurance'] },
+      { kind: 'check', title: 'Quick check', question: 'Reminder group was also enrolled after a new BP clinic opened. The problem?', options: [
+        { text: 'Chance', why: 'The issue is not sample size.' },
+        { text: 'Confounding by time (co-intervention)', correct: true, why: 'The new clinic could explain the change.' },
+        { text: 'Measurement error', why: 'The outcome was measured the same way.' }
       ] }
     ],
-    keyIdeas: ['The question decides the design.', 'A comparison group strengthens any causal claim.', 'Qualitative work explains how and why.', 'Plan how you will limit bias before you start.'],
-    practice: [{ tip: 'Use the research compass to locate your study type.', cite: 'ringsted' }, { tip: 'Answer the 28 design questions before data collection.', cite: 'bordageDawson' }],
+    keyIdeas: ['Simplest design that answers the question.', 'Write the outcome so two people would measure it the same way.', 'Every outcome gets a planned analysis.', 'See a biostatistician before collecting data.'],
+    practice: [{ tip: 'Report effect sizes with confidence intervals.', cite: 'sullivanFeinn' }, { tip: 'Building a survey? Follow the seven steps.', cite: 'artino' }],
     assignment: {
-      title: 'Study design and methods outline',
-      steps: ['Choose a design.', 'Describe setting, participants, sampling.', 'Describe intervention, comparator, procedures.'],
-      output: 'Methods outline (about 1 page).',
+      title: 'Design and analysis plan',
+      steps: ['Choose a design and say why.', 'Define participants, intervention and exact outcome.', 'Match an analysis to the outcome.'],
+      output: 'One page: design, people, outcome, analysis.',
+      minutes: 30,
       fields: [
-        { key: 'design', label: 'Design', kind: 'select', required: true, options: ['Single-group pre/post', 'Controlled pre/post', 'Randomized trial', 'Crossover', 'Qualitative (interviews / focus groups)', 'Mixed methods', 'Survey', 'Design-based research', 'Other'], concierge: 'design' },
-        { key: 'rationale', label: 'Why this design', kind: 'long', required: true, example: 'Crossover lets every student get SimPatient while giving a fair comparison.', concierge: 'rationale' },
-        { key: 'setting', label: 'Setting', kind: 'text', required: true, example: 'OB/GYN clerkship, one academic hospital, 2027.', concierge: 'setting' },
-        { key: 'population', label: 'Participants', kind: 'long', required: true, example: 'Third-year students on the clerkship (about 30 per block).', concierge: 'population' },
-        { key: 'recruitment', label: 'Sampling & recruitment', kind: 'long', required: true, example: 'All students invited; opt-in; grades unaffected.', concierge: 'recruitment' },
-        { key: 'exposure', label: 'Intervention', kind: 'long', required: true, concierge: 'exposure' },
-        { key: 'comparator', label: 'Comparator', kind: 'text', hint: 'If none, say so.', concierge: 'comparator' },
-        { key: 'procedures', label: 'Procedures & timeline', kind: 'long', concierge: 'procedures' },
+        { key: 'design', label: 'Design', kind: 'select', required: true, options: ['Retrospective cohort / chart review', 'Case-control', 'Cross-sectional survey', 'Prospective observational', 'Pre–post / quality improvement', 'Randomized trial', 'Nonrandomized intervention', 'Educational pre–post', 'Qualitative (interviews / focus groups)', 'Mixed methods', 'Other'], concierge: 'design' },
+        { key: 'rationale', label: 'Why this design', kind: 'long', required: true, starter: 'This design fits because … . A stronger design is not feasible because … .', concierge: 'rationale' },
+        { key: 'population', label: 'Participants', kind: 'long', required: true, starter: 'Include: … Exclude: … Expected number: …', example: 'Include: postpartum patients with a hypertensive disorder, delivered here. Exclude: no phone. ~200/year.', concierge: 'population' },
+        { key: 'exposure', label: 'Intervention / exposure & comparison', kind: 'long', required: true, starter: 'Intervention: … Compared with: …', concierge: 'exposure' },
+        { key: 'primaryOutcome', label: 'Primary outcome (exact)', kind: 'long', required: true, starter: 'The proportion of … with … measured by … at … .', concierge: 'primaryOutcome' },
+        { key: 'dataSource', label: 'Data source / instrument', kind: 'text', required: true, example: 'EHR chart review; REDCap form', concierge: 'dataSource' },
+        { key: 'analysis', label: 'Analysis plan', kind: 'long', required: true, starter: 'We will compare … using … and report … with 95% confidence intervals. We will adjust for … .', concierge: 'analysis' },
+        { key: 'sampleSize', label: 'Sample size or feasibility', kind: 'long', starter: 'We expect … participants in … months, which is enough to … / a feasibility sample because … .', concierge: 'sampleSize' },
         { key: 'bias', label: 'Main bias + how you’ll limit it', kind: 'long', concierge: 'bias' }
       ]
     },
-    readings: ['ringsted', 'bordageDawson', 'kuper', 'creswell', 'malterud']
+    readings: ['grimes', 'hulley', 'sullivanFeinn', 'sullivanArtino', 'artino', 'strobe']
   },
   {
-    n: 4, tone: 'w4', title: 'Assessment, measurement & evidence', short: 'Measures',
-    promise: 'Measure learning — not just satisfaction.',
-    frameworks: ['Miller’s pyramid', 'Kirkpatrick', 'Messick validity', 'Kane validity argument', 'Rubrics & rater calibration'],
+    n: 4, tone: 'w4', title: 'Mentor, logistics & dissemination', short: 'Plan',
+    promise: 'Make sure it can be finished — and shared.',
+    frameworks: ['Mentorship', 'Feasibility: GO / REVISE / DEFER', 'Human subjects training', 'Scholarship standards'],
+    theory: [
+      { label: 'Mentors change outcomes', text: 'Mentored trainees report more research productivity and career satisfaction.' },
+      { label: 'Ethics starts with training', text: 'Belmont principles — respect, beneficence, justice — underlie the CITI or OHRP course your IRB requires.' },
+      { label: 'Feasibility is a decision', text: 'Time, data access, people and money. Decide GO, REVISE or DEFER honestly.' },
+      { label: 'Scholarship is public', text: 'Work becomes scholarship when it is shared and peer reviewed.' }
+    ],
+    theoryCites: ['sambunjak', 'belmont', 'glassick'],
     slides: [
-      { kind: 'compare', title: 'Learning vs satisfaction', left: { label: 'Satisfaction', items: ['“Did you like it?”', 'Kirkpatrick 1'] }, right: { label: 'Learning', items: ['“Can they do it?”', 'Observed skill, OSCE, rubric'] } },
-      { kind: 'pyramid', title: "Miller's pyramid", items: [{ label: 'Does', text: 'Workplace assessment' }, { label: 'Shows how', text: 'OSCE, simulation' }, { label: 'Knows how', text: 'Case questions' }, { label: 'Knows', text: 'MCQ' }], caption: 'Miller 1990' },
-      { kind: 'cards', title: 'Validity evidence', items: [{ label: 'Content', text: 'Right items?' }, { label: 'Response process', text: 'Used as intended?' }, { label: 'Internal structure', text: 'Reliable?' }, { label: 'Relations', text: 'Fits other measures?' }, { label: 'Consequences', text: 'Helps or harms?' }], caption: 'Messick, via Cook & Beckman 2006. Kane: build an argument (Cook et al. 2015).' },
-      { kind: 'compare', title: 'Rubric or rating scale?', left: { label: 'Analytic rubric', items: ['Criteria × levels', 'Specific feedback'] }, right: { label: 'Global rating', items: ['Fast, expert judgment', 'Good for complex skills'] } },
-      { kind: 'steps', title: 'Calibrate raters', items: [{ label: 'Train', text: 'Shared examples' }, { label: 'Rate', text: 'Same videos' }, { label: 'Discuss', text: 'Resolve gaps' }, { label: 'Check', text: 'Agreement (ICC, kappa)' }] },
-      { kind: 'case', title: 'Running example', text: RUNNING_CASE, points: ['Outcome: OSCE communication (shows how)', 'Instrument: 6-item analytic rubric', 'Validity: expert review, rater training, ICC'] },
-      { kind: 'check', title: 'Quick check', question: 'Two faculty score the same video very differently. Which validity source is at risk?', options: [
-        { text: 'Internal structure (reliability)', correct: true, why: 'Low agreement between raters is a reliability problem.' },
-        { text: 'Content', why: 'Content is about whether items cover the skill.' },
-        { text: 'Consequences', why: 'That is about effects of using the scores.' }
+      { kind: 'cards', title: 'A good mentor', items: [{ label: 'Content or method', text: 'Knows your topic or your design' }, { label: 'Available', text: 'Regular short meetings' }, { label: 'Track record', text: 'Has finished projects' }], caption: 'Sambunjak et al. 2006' },
+      { kind: 'steps', title: 'Human subjects training', items: [{ label: 'Ask your IRB', text: 'Which course?' }, { label: 'Take it', text: 'CITI (often free via institution) or OHRP' }, { label: 'Save certificate', text: 'You’ll attach it' }] },
+      { kind: 'cards', title: 'Feasibility check', items: [{ label: 'Time', text: 'Done before graduation?' }, { label: 'Data', text: 'Access approved?' }, { label: 'People', text: 'Who helps?' }, { label: 'Money', text: 'Any costs covered?' }] },
+      { kind: 'compare', title: 'GO / REVISE / DEFER', left: { label: 'GO', items: ['Data, mentor, time all in place'] }, right: { label: 'REVISE or DEFER', items: ['Shrink scope, change data source, or save for later'] } },
+      { kind: 'steps', title: 'Share it', items: [{ label: 'Abstract', text: 'Regional or national meeting' }, { label: 'Poster', text: 'Department research day' }, { label: 'Paper', text: 'Peer-reviewed journal' }], caption: 'Authorship per ICMJE' },
+      { kind: 'case', title: 'Running example', text: RUNNING_CASE, points: ['Mentor: MFM faculty + nurse navigator', 'Timeline: IRB Jan, data Mar–Aug, abstract Oct', 'Call: GO'] },
+      { kind: 'check', title: 'Quick check', question: 'Your data needs a new IT report that may take 6 months. Best call?', options: [
+        { text: 'GO — it will work out.', why: 'Ignores a real risk.' },
+        { text: 'REVISE — use data you can get now, or shrink scope.', correct: true, why: 'Keeps the project finishable.' },
+        { text: 'Abandon research entirely.', why: 'Too drastic; revise first.' }
       ] }
     ],
-    keyIdeas: ['Measure at the highest Miller or Kirkpatrick level you can.', 'Validity is an argument built from evidence.', 'Pilot your rubric and train raters.', 'Use an existing instrument when one fits.'],
-    practice: [{ tip: 'Follow seven steps when building a survey.', cite: 'artino' }, { tip: 'Plan validation like a simulation study.', cite: 'cookHatala' }],
+    keyIdeas: ['Ask a mentor early, with a one-page plan.', 'Finish CITI/OHRP training now.', 'Build a timeline backward from graduation.', 'Pick a meeting deadline to aim for.'],
+    practice: [{ tip: 'Agree on authorship roles at the start.', cite: 'icmje' }, { tip: 'Meet your mentor briefly and regularly.', cite: 'sambunjak' }],
     assignment: {
-      title: 'Assessment and evaluation blueprint',
-      steps: ['Define the primary outcome.', 'Draft a rubric or instrument.', 'Plan validity evidence.'],
-      output: 'Outcome table + draft rubric + validity plan.',
+      title: 'Feasibility and dissemination plan',
+      steps: ['Complete training and name a mentor.', 'Sketch logistics and a timeline.', 'Make a GO/REVISE/DEFER call and pick a venue.'],
+      output: 'Training done, mentor, timeline, call, venue.',
+      minutes: 30,
       fields: [
-        { key: 'primaryOutcome', label: 'Primary outcome', kind: 'long', required: true, example: 'OSCE communication score on a 6-item rubric, end of block.', concierge: 'primaryOutcome' },
-        { key: 'outcomeLevel', label: 'Outcome level', kind: 'select', options: KIRK, required: true, concierge: 'outcomeLevel' },
-        { key: 'secondaryOutcomes', label: 'Other outcomes', kind: 'long', concierge: 'secondaryOutcomes' },
-        { key: 'instrument', label: 'Draft rubric or instrument', kind: 'long', required: true, hint: 'Criteria and levels, or items.', example: '1 Opening · 2 Listening · 3 Empathy · 4 Explaining · 5 Shared decision · 6 Closing — each 1 (needs work) to 3 (strong).', concierge: 'instrument' },
-        { key: 'validityPlan', label: 'Validity evidence plan', kind: 'long', required: true, hint: 'Which of the 5 sources, and how?', concierge: 'validityPlan' },
-        { key: 'raterPlan', label: 'Rater training & reliability', kind: 'long', concierge: 'raterPlan' }
-      ]
-    },
-    readings: ['miller', 'cookBeckman', 'cookKane', 'cookHatala', 'artino', 'yardley']
-  },
-  {
-    n: 5, tone: 'w5', title: 'Analysis, ethics & the proposal', short: 'Proposal',
-    promise: 'Put it all together into a protocol.',
-    frameworks: ['Analysis planning', 'Thematic analysis', 'Mixed-methods integration', 'Belmont principles', 'Reporting guidelines'],
-    slides: [
-      { kind: 'table', title: 'Match analysis to outcome', columns: ['Data', 'Common analysis'], rows: [['Scores, one group pre/post', 'Paired t-test or Wilcoxon'], ['Scores, two groups', 't-test, Mann-Whitney, ANCOVA'], ['Yes/no outcomes', 'Chi-square or Fisher'], ['Likert items', 'Ordinal methods'], ['Interview text', 'Thematic analysis']], caption: 'Sullivan & Artino 2013' },
-      { kind: 'cards', title: 'Beyond the P value', items: [{ label: 'Effect size', text: 'How big is the change?' }, { label: 'Confidence interval', text: 'How certain?' }, { label: 'Sample size', text: 'Planned from the effect you expect' }], caption: 'Sullivan & Feinn 2012' },
-      { kind: 'steps', title: 'Qualitative rigor', items: [{ label: 'Familiarize' }, { label: 'Code' }, { label: 'Build themes' }, { label: 'Review' }, { label: 'Name & write' }], caption: 'Braun & Clarke 2006 · Trustworthiness: Lincoln & Guba 1985' },
-      { kind: 'cards', title: 'Ethics essentials', items: [{ label: 'Respect', text: 'Real consent, free to decline' }, { label: 'Beneficence', text: 'Minimize risk' }, { label: 'Justice', text: 'Fair selection' }, { label: 'IRB decides', text: 'Never self-declare exempt' }], caption: 'Belmont Report; 45 CFR 46' },
-      { kind: 'steps', title: 'Proposal flow', items: [{ label: 'Problem & gap' }, { label: 'Question' }, { label: 'Framework' }, { label: 'Design' }, { label: 'Measures' }, { label: 'Analysis' }, { label: 'Ethics & timeline' }], caption: 'Report with EQUATOR guidelines (e.g., SRQR)' },
-      { kind: 'case', title: 'Running example', text: RUNNING_CASE, points: ['Analysis: mixed model for crossover scores + effect size', 'Interviews: thematic analysis', 'Ethics: opt-in, not graded, data de-identified'] },
-      { kind: 'check', title: 'Quick check', question: 'Your students are also your trainees. Biggest ethical risk?', options: [
-        { text: 'Too few participants', why: 'A feasibility issue, not the main ethics risk.' },
-        { text: 'Students feeling pressure to take part', correct: true, why: 'Power differences threaten voluntary consent; separate recruitment from grading.' },
-        { text: 'Using a rubric', why: 'Rubrics are not an ethical risk in themselves.' }
-      ] }
-    ],
-    keyIdeas: ['Plan the analysis before you collect data.', 'Report effect sizes and uncertainty.', 'Protect learners: voluntary, confidential, separate from grades.', 'Your IRB — not you — decides the review category.'],
-    practice: [{ tip: 'Check your draft against common reasons for rejection.', cite: 'bordage2001' }, { tip: 'Judge the whole proposal with Glassick’s six standards.', cite: 'glassick' }],
-    assignment: {
-      title: 'Integrated research protocol',
-      steps: ['Plan the analysis.', 'Address ethics and feasibility.', 'Add a timeline, then export.'],
-      output: 'Exportable protocol (Weeks 1–5 combined).',
-      fields: [
-        { key: 'analysis', label: 'Analysis plan', kind: 'long', required: true, example: 'Linear mixed model on rubric scores (period, sequence); Cohen’s d with 95% CI. Interviews: thematic analysis.', concierge: 'analysis' },
-        { key: 'sampleSize', label: 'Sample size reasoning', kind: 'long', required: true, concierge: 'sampleSize' },
-        { key: 'risksBenefits', label: 'Risks & benefits', kind: 'long', required: true, concierge: 'risksBenefits' },
-        { key: 'consent', label: 'Consent & recruitment protections', kind: 'long', required: true, concierge: 'consent' },
-        { key: 'privacy', label: 'Confidentiality & data', kind: 'long', required: true, concierge: 'privacy' },
+        { key: 'training.course', label: 'Human subjects training', kind: 'text', required: true, starter: 'Course: … Completed on: …', example: 'CITI Biomedical Research — Basic, completed Nov 2', concierge: 'training.course' },
+        { key: 'mentor.name', label: 'Mentor (even if not asked yet)', kind: 'text', required: true, concierge: 'mentor.name' },
+        { key: 'mentor.why', label: 'Why this mentor', kind: 'long', concierge: 'mentor.why' },
+        { key: 'logistics', label: 'Data access, people, costs', kind: 'long', required: true, starter: 'Data: … People: … Costs: … (funded by …)', concierge: 'logistics.resources' },
+        { key: 'timeline', label: 'Timeline', kind: 'long', required: true, starter: 'IRB: … · Data: … · Analysis: … · Abstract: … · Paper: …', concierge: 'timeline' },
+        { key: 'risksSummary', label: 'Biggest risk + fallback', kind: 'long', starter: 'Risk: … Fallback: …', concierge: 'risksSummary' },
         { key: 'feasibility', label: 'Feasibility call', kind: 'select', options: ['GO', 'REVISE', 'DEFER'], required: true, concierge: 'feasibility' },
-        { key: 'feasibilityReason', label: 'Why', kind: 'long', concierge: 'feasibilityReason' },
-        { key: 'timeline', label: 'Timeline', kind: 'long', required: true, example: 'Jan: IRB · Mar–Jun: data · Jul: analysis · Sep: abstract.', concierge: 'timeline' }
+        { key: 'dissemination', label: 'Where you’ll share it', kind: 'text', required: true, example: 'ACOG Annual Meeting abstract; department research day' }
       ]
     },
-    readings: ['sullivanFeinn', 'sullivanArtino', 'braunClarke', 'lincolnGuba', 'belmont', 'commonRule', 'citi', 'equator', 'srqr', 'bordage2001', 'glassick']
+    readings: ['sambunjak', 'citi', 'ohrp', 'belmont', 'icmje', 'glassick']
+  },
+  {
+    n: 5, tone: 'w5', title: 'Protocol & IRB draft', short: 'IRB',
+    promise: 'Pull Weeks 1–4 into a protocol your mentor and IRB can review.',
+    frameworks: ['Belmont principles', 'Common Rule review levels', 'Consent & privacy', 'Reporting guidelines'],
+    theory: [
+      { label: 'Belmont, applied', text: 'Respect → consent. Beneficence → minimize risk. Justice → fair selection.' },
+      { label: 'Your IRB decides the level', text: 'Exempt, expedited or full board — you propose, the IRB determines.' },
+      { label: 'Minimum necessary data', text: 'Collect only what you need; plan storage, access and destruction.' },
+      { label: 'Write for the reader', text: 'Common rejection reasons: weak question, poor design, unclear methods. Fix them now.' }
+    ],
+    theoryCites: ['belmont', 'commonRule', 'bordage2001'],
+    slides: [
+      { kind: 'cards', title: 'Belmont principles', items: [{ label: 'Respect for persons', text: 'Informed, voluntary consent' }, { label: 'Beneficence', text: 'Benefits outweigh risks' }, { label: 'Justice', text: 'Fair burden and benefit' }], caption: 'The Belmont Report, 1979' },
+      { kind: 'pyramid', title: 'Review levels', items: [{ label: 'Full board', text: 'More than minimal risk' }, { label: 'Expedited', text: 'Minimal risk, listed categories' }, { label: 'Exempt', text: 'Certain minimal-risk categories' }], caption: '45 CFR 46 — the IRB decides, not you' },
+      { kind: 'cards', title: 'Protect data', items: [{ label: 'Minimum', text: 'Only needed fields' }, { label: 'Secure', text: 'Approved storage (e.g., REDCap)' }, { label: 'Code it', text: 'Key kept separately' }, { label: 'Destroy', text: 'Say when' }] },
+      { kind: 'steps', title: 'Protocol outline', items: [{ label: 'Background & gap' }, { label: 'Question' }, { label: 'Methods' }, { label: 'Analysis' }, { label: 'Ethics & privacy' }, { label: 'Timeline' }] },
+      { kind: 'cards', title: 'Avoid common rejections', items: [{ label: 'Unclear question' }, { label: 'Design can’t answer it' }, { label: 'Outcome not defined' }, { label: 'No analysis plan' }], caption: 'Bordage 2001' },
+      { kind: 'case', title: 'Running example', text: RUNNING_CASE, points: ['Likely expedited or exempt — IRB decides', 'Waiver of consent requested for chart review', 'Data in REDCap, coded, destroyed after 5 years'] },
+      { kind: 'check', title: 'Quick check', question: 'Who decides if your study is exempt?', options: [
+        { text: 'You, the investigator', why: 'Investigators propose; they don’t decide.' },
+        { text: 'Your mentor', why: 'Mentors advise; the IRB determines.' },
+        { text: 'The IRB', correct: true, why: 'Only the IRB (or its designee) makes the determination.' }
+      ] }
+    ],
+    keyIdeas: ['Reuse Weeks 1–4 — don’t start over.', 'Propose a review level; let the IRB decide.', 'Write a clear privacy plan.', 'List what is still missing.'],
+    practice: [{ tip: 'Check your draft against common reasons for rejection.', cite: 'bordage2001' }, { tip: 'Use the right reporting checklist from the start.', cite: 'equator' }],
+    assignment: {
+      title: 'Protocol and IRB draft',
+      steps: ['Fill the ethics fields.', 'List what is missing.', 'Export the full protocol.'],
+      output: 'Exportable protocol draft (Weeks 1–5).',
+      minutes: 30,
+      fields: [
+        { key: 'reviewCategory', label: 'Likely review level (IRB decides)', kind: 'text', required: true, starter: 'Likely … because … ; for IRB determination.', concierge: 'reviewCategory' },
+        { key: 'risksBenefits', label: 'Risks & benefits', kind: 'long', required: true, starter: 'Risks: … Minimized by: … Benefits: …', concierge: 'risksBenefits' },
+        { key: 'consent', label: 'Consent approach', kind: 'long', required: true, starter: 'We will obtain … consent / request a waiver because … .', concierge: 'consent' },
+        { key: 'privacy', label: 'Privacy & data plan', kind: 'long', required: true, starter: 'Data collected: … Stored in: … Access: … Destroyed: …', concierge: 'privacy' },
+        { key: 'outstanding', label: 'Still missing', kind: 'long', required: true, starter: 'Forms: … Approvals: … Decisions: …', concierge: 'outstanding' },
+        { key: 'decision', label: 'Continue as capstone?', kind: 'select', options: ['Go — make it my capstone', 'Revise first', 'No — not this project'], required: true, concierge: 'decision' }
+      ]
+    },
+    readings: ['belmont', 'commonRule', 'citi', 'bordage2001', 'equator', 'strobe', 'srqr']
   }
 ];
 

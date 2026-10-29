@@ -63,7 +63,7 @@ export async function exportAssignment(n: number) {
 
 export async function exportProtocol() {
   const children: Paragraph[] = [para('Draft research proposal assembled from Research Design Academy assignments. For faculty review; not an IRB submission.', { italics: true, color: '6A6158' })];
-  const titles = ['1. Problem, gap and research question', '2. Theoretical and conceptual framework', '3. Study design and methods', '4. Outcomes, measurement and validity', '5. Analysis, ethics, feasibility and timeline'];
+  const titles = ['1. Research story and question', '2. Literature and evidence gap', '3. Design, measures and analysis', '4. Mentor, logistics and dissemination', '5. Ethics and IRB preparation'];
   COURSE.forEach((w, i) => {
     children.push(head(titles[i], HeadingLevel.HEADING_1));
     children.push(...weekBody(w.n, false));
