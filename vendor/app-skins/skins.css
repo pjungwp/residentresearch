@@ -47,6 +47,11 @@
   --sk-art-tall: none;
   --sk-deco: none;
   --sk-deco-2: none;
+  --sk-watermark: none;
+  --sk-pattern: none;
+  --sk-perch: none;
+  --sk-perch-room: 0px;
+  --sk-hdr-deco: none;
   --sk-display-style: normal;
   color-scheme: light;
 }
@@ -90,6 +95,11 @@
   --sk-art-tall: none;
   --sk-deco: url("./art/elegant-corner-bl.webp");
   --sk-deco-2: url("./art/elegant-corner-tr.webp");
+  --sk-watermark: none;
+  --sk-pattern: none;
+  --sk-perch: none;
+  --sk-perch-room: 0px;
+  --sk-hdr-deco: url("./art/elegant-corner-tr.webp");
   --sk-display-style: normal;
   color-scheme: dark;
 }
@@ -133,6 +143,11 @@
   --sk-art-tall: url("./art/glass-tall.webp");
   --sk-deco: none;
   --sk-deco-2: none;
+  --sk-watermark: none;
+  --sk-pattern: none;
+  --sk-perch: none;
+  --sk-perch-room: 0px;
+  --sk-hdr-deco: none;
   --sk-display-style: normal;
   color-scheme: dark;
 }
@@ -160,7 +175,7 @@
   --sk-tint-mix: 34%;
   --sk-display: "Playfair Display", Georgia, serif;
   --sk-display-weight: 600;
-  --sk-cell: rgb(255 250 241 / .92);
+  --sk-cell: rgb(255 250 241 / .74);
   --sk-cell-line: #cdbfa4;
   --sk-cell-border: 1px;
   --sk-cell-radius: 2px;
@@ -176,6 +191,11 @@
   --sk-art-tall: none;
   --sk-deco: url("./art/editorial-magnolia-branch.webp");
   --sk-deco-2: url("./art/editorial-magnolia-sprig.webp");
+  --sk-watermark: url("./art/editorial-watermark.webp");
+  --sk-pattern: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .35 0 0 0 0 .28 0 0 0 0 .18 0 0 0 .09 0'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23n)'/%3E%3C/svg%3E");
+  --sk-perch: none;
+  --sk-perch-room: 0px;
+  --sk-hdr-deco: url("./art/editorial-magnolia-sprig.webp");
   --sk-display-style: normal;
   color-scheme: light;
 }
@@ -220,6 +240,11 @@
   --sk-art-tall: url("./art/impressionist-tall.webp");
   --sk-deco: none;
   --sk-deco-2: none;
+  --sk-watermark: none;
+  --sk-pattern: none;
+  --sk-perch: none;
+  --sk-perch-room: 0px;
+  --sk-hdr-deco: none;
   color-scheme: light;
 }
 
@@ -246,7 +271,7 @@
   --sk-tint-mix: 40%;
   --sk-display: "Fredoka", ui-rounded, system-ui, sans-serif;
   --sk-display-weight: 600;
-  --sk-cell: #fffaf2;
+  --sk-cell: rgb(255 250 242 / .8);
   --sk-cell-line: #ecdcc2;
   --sk-cell-border: 1.5px;
   --sk-cell-radius: 18px;
@@ -260,8 +285,13 @@
   --sk-err-bg: #fde4e1;
   --sk-art-wide: none;
   --sk-art-tall: none;
-  --sk-deco: url("./art/playful-cat.webp");
+  --sk-deco: url("./art/playful-mug-books.webp");
   --sk-deco-2: url("./art/playful-vine.webp");
+  --sk-watermark: url("./art/playful-watermark.webp");
+  --sk-pattern: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='44' height='44'%3E%3Cg fill='%23efd6b6'%3E%3Ccircle cx='11' cy='11' r='3'/%3E%3Ccircle cx='33' cy='33' r='3'/%3E%3C/g%3E%3Cpath d='M33 8.6c-1-1.6-3.4-1-3.4.8 0 1.6 2 2.7 3.4 3.9 1.4-1.2 3.4-2.3 3.4-3.9 0-1.8-2.4-2.4-3.4-.8z' fill='%23f6c6c0'/%3E%3C/svg%3E");
+  --sk-perch: url("./art/playful-cat.webp");
+  --sk-perch-room: 30px;
+  --sk-hdr-deco: url("./art/playful-sprig.webp");
   --sk-display-style: normal;
   color-scheme: light;
 }
@@ -305,6 +335,11 @@
   --sk-art-tall: url("./art/pop-tall.webp");
   --sk-deco: none;
   --sk-deco-2: url("./art/pop-interrobang.webp");
+  --sk-watermark: none;
+  --sk-pattern: none;
+  --sk-perch: none;
+  --sk-perch-room: 0px;
+  --sk-hdr-deco: url("./art/pop-interrobang.webp");
   --sk-display-style: normal;
   color-scheme: light;
 }
@@ -314,9 +349,23 @@
 /* background art: a fixed layer behind everything; tall art on portrait screens */
 :root[data-skin] body::before {
   content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none;
-  background: var(--sk-art-wide) center / cover no-repeat;
+  /* layers, top to bottom: faint watermark illustration, painted background, repeating texture/pattern */
+  background: var(--sk-watermark) right -3vw bottom 2vh / auto min(70vh, 660px) no-repeat, var(--sk-art-wide) center / cover no-repeat, var(--sk-pattern);
 }
-@media (orientation: portrait) { :root[data-skin] body::before { background-image: var(--sk-art-tall); } }
+@media (orientation: portrait) { :root[data-skin] body::before { background-image: var(--sk-watermark), var(--sk-art-tall), var(--sk-pattern); background-size: auto min(48vh, 420px), cover, auto; } }
+/* opt-in hooks for apps:
+   .sk-perch     a bar whose top edge a mascot can sit on (e.g. the bottom navigation)
+   .sk-hdr-deco  a header that shows a small decoration at its right edge, behind its content */
+:root[data-skin] .sk-perch { position: relative; margin-top: var(--sk-perch-room); }
+:root[data-skin] .sk-perch::before {
+  content: ""; position: absolute; right: 18px; bottom: calc(100% - 14px); width: 64px; height: 44px; pointer-events: none;
+  background: var(--sk-perch) center bottom / contain no-repeat;
+}
+:root[data-skin] .sk-hdr-deco { isolation: isolate; } /* the header must be positioned (relative, sticky or fixed) */
+:root[data-skin] .sk-hdr-deco::after {
+  content: ""; position: absolute; top: 0; bottom: 0; right: 0; width: min(42%, 280px); z-index: -1; pointer-events: none;
+  background: var(--sk-hdr-deco) right 8px center / auto 86% no-repeat; opacity: .38;
+}
 /* corner decoration (wide screens only, so it never sits under phone content) */
 :root[data-skin] body::after {
   content: ""; position: fixed; left: 0; bottom: 0; width: min(26vw, 300px); height: min(78vh, 800px); z-index: -1; pointer-events: none;

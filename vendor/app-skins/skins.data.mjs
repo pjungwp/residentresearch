@@ -21,7 +21,7 @@ export const SKINS = [
       hdr1: '#0d0c0a', hdr2: '#1a170f', hdrInk: '#f1e9d8', radius: '12px', radiusSm: '8px',
       shadow: '0 1px 0 rgb(201 162 74 / .12) inset, 0 8px 24px rgb(0 0 0 / .35)', blur: 'none', tintMix: '20%',
       display: '"Cormorant Garamond", Georgia, serif', displayWeight: '600', cell: 'rgb(23 21 15 / .9)', cellLine: 'rgb(201 162 74 / .38)', cellBorder: '1px', cellRadius: '6px', cellShadow: 'none', cellTint: '12%', ...darkStatus },
-    art: { deco: 'art/elegant-corner-bl.webp', deco2: 'art/elegant-corner-tr.webp', extras: ['art/elegant-branch.webp', 'art/elegant-sprig.webp', 'art/elegant-divider.webp'] },
+    art: { hdrDeco: 'art/elegant-corner-tr.webp', deco: 'art/elegant-corner-bl.webp', deco2: 'art/elegant-corner-tr.webp', extras: ['art/elegant-branch.webp', 'art/elegant-sprig.webp', 'art/elegant-divider.webp'] },
   },
   {
     id: 'glass', name: 'Glass', blurb: 'Dusk gradient with frosted panels', scheme: 'dark',
@@ -38,8 +38,8 @@ export const SKINS = [
       accent: '#7d2e2e', accent2: '#622323', accentSoft: '#f1e0d6', onAccent: '#ffffff', accentText: '#7d2e2e',
       hdr1: '#f6f0e4', hdr2: '#f6f0e4', hdrInk: '#1e1a15', radius: '6px', radiusSm: '4px',
       shadow: 'none', blur: 'none', tintMix: '34%',
-      display: '"Playfair Display", Georgia, serif', displayWeight: '600', cell: 'rgb(255 250 241 / .92)', cellLine: '#cdbfa4', cellBorder: '1px', cellRadius: '2px', cellShadow: 'none', cellTint: '14%', ...lightStatus },
-    art: { deco: 'art/editorial-magnolia-branch.webp', deco2: 'art/editorial-magnolia-sprig.webp', extras: ['art/editorial-magnolia-bloom.webp', 'art/editorial-petals.webp'] },
+      display: '"Playfair Display", Georgia, serif', displayWeight: '600', cell: 'rgb(255 250 241 / .74)', cellLine: '#cdbfa4', cellBorder: '1px', cellRadius: '2px', cellShadow: 'none', cellTint: '14%', ...lightStatus },
+    art: { watermark: 'art/editorial-watermark.webp', pattern: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .35 0 0 0 0 .28 0 0 0 0 .18 0 0 0 .09 0'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23n)'/%3E%3C/svg%3E\")", hdrDeco: 'art/editorial-magnolia-sprig.webp', deco: 'art/editorial-magnolia-branch.webp', deco2: 'art/editorial-magnolia-sprig.webp', extras: ['art/editorial-magnolia-bloom.webp', 'art/editorial-petals.webp'] },
   },
   {
     id: 'impressionist', name: 'Impressionist', blurb: 'Painted riverside at golden hour', scheme: 'light',
@@ -56,8 +56,8 @@ export const SKINS = [
       accent: '#d9652c', accent2: '#bd5423', accentSoft: '#fde4d2', onAccent: '#ffffff', accentText: '#b4501f',
       hdr1: '#fbf3e6', hdr2: '#fbf3e6', hdrInk: '#3a2a1c', radius: '22px', radiusSm: '16px',
       shadow: '0 4px 0 #ecdcc2', blur: 'none', tintMix: '40%',
-      display: '"Fredoka", ui-rounded, system-ui, sans-serif', displayWeight: '600', cell: '#fffaf2', cellLine: '#ecdcc2', cellBorder: '1.5px', cellRadius: '18px', cellShadow: '0 3px 0 #ecdcc2', cellTint: '22%', ...lightStatus },
-    art: { deco: 'art/playful-cat.webp', deco2: 'art/playful-vine.webp', extras: ['art/playful-mug-books.webp', 'art/playful-plant.webp', 'art/playful-sprig.webp', 'art/playful-papers.webp', 'art/playful-lamp.webp', 'art/playful-heart.webp'] },
+      display: '"Fredoka", ui-rounded, system-ui, sans-serif', displayWeight: '600', cell: 'rgb(255 250 242 / .8)', cellLine: '#ecdcc2', cellBorder: '1.5px', cellRadius: '18px', cellShadow: '0 3px 0 #ecdcc2', cellTint: '22%', ...lightStatus },
+    art: { watermark: 'art/playful-watermark.webp', pattern: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='44' height='44'%3E%3Cg fill='%23efd6b6'%3E%3Ccircle cx='11' cy='11' r='3'/%3E%3Ccircle cx='33' cy='33' r='3'/%3E%3C/g%3E%3Cpath d='M33 8.6c-1-1.6-3.4-1-3.4.8 0 1.6 2 2.7 3.4 3.9 1.4-1.2 3.4-2.3 3.4-3.9 0-1.8-2.4-2.4-3.4-.8z' fill='%23f6c6c0'/%3E%3C/svg%3E\")", perch: 'art/playful-cat.webp', hdrDeco: 'art/playful-sprig.webp', deco: 'art/playful-mug-books.webp', deco2: 'art/playful-vine.webp', extras: ['art/playful-mug-books.webp', 'art/playful-plant.webp', 'art/playful-sprig.webp', 'art/playful-papers.webp', 'art/playful-lamp.webp', 'art/playful-heart.webp'] },
   },
   {
     id: 'pop', name: 'Pop', blurb: 'Bold comic red, black and cream', scheme: 'light',
@@ -66,7 +66,7 @@ export const SKINS = [
       hdr1: '#111111', hdr2: '#1c1c1c', hdrInk: '#ffffff', radius: '4px', radiusSm: '3px',
       shadow: '5px 5px 0 #111111', blur: 'none', tintMix: '32%',
       display: '"Anton", Impact, "Arial Narrow", sans-serif', displayWeight: '400', cell: '#fff8ec', cellLine: '#111111', cellBorder: '2px', cellRadius: '3px', cellShadow: '3px 3px 0 #111111', cellTint: '16%', ...lightStatus },
-    art: { wide: 'art/pop-wide.webp', tall: 'art/pop-tall.webp', deco2: 'art/pop-interrobang.webp', extras: ['art/pop-burst.webp', 'art/pop-star-outline.webp', 'art/pop-arrow.webp', 'art/pop-missions.webp', 'art/pop-levelup.webp', 'art/pop-week1.webp', 'art/pop-complete.webp', 'art/pop-new.webp', 'art/pop-inprogress.webp', 'art/pop-locked.webp'] },
+    art: { wide: 'art/pop-wide.webp', tall: 'art/pop-tall.webp', hdrDeco: 'art/pop-interrobang.webp', deco2: 'art/pop-interrobang.webp', extras: ['art/pop-burst.webp', 'art/pop-star-outline.webp', 'art/pop-arrow.webp', 'art/pop-missions.webp', 'art/pop-levelup.webp', 'art/pop-week1.webp', 'art/pop-complete.webp', 'art/pop-new.webp', 'art/pop-inprogress.webp', 'art/pop-locked.webp'] },
   },
 ]
 
