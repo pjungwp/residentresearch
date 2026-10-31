@@ -64,3 +64,14 @@ describe('assignment workflow', () => {
     expect((await getProjectCached(r1.projectId))?.fields.question.value).toBe('Edited in Concierge');
   });
 });
+
+describe('question starters follow the question type', () => {
+  it('switches starter for PEO/SPIDER and treats any unedited starter as blank', async () => {
+    const { COURSE, starterFor, isBlankAnswer } = await import('@/content/course');
+    const q = COURSE[0].assignment.fields.find((f) => f.key === 'question')!;
+    expect(starterFor(q, { framework: 'PICOT' })).toMatch(/compared with/);
+    expect(starterFor(q, { framework: 'PEO' })).toMatch(/experience/);
+    expect(isBlankAnswer(q, starterFor(q, { framework: 'SPIDER' })!)).toBe(true);
+    expect(isBlankAnswer(q, 'How do residents experience night float?')).toBe(false);
+  });
+});

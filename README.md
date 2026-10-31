@@ -7,7 +7,9 @@ Two separate experiences that share one look and feel:
 | **Research Design Academy** | Five-week mini-course in educational research design. Each week has 7 colorful slides (one idea each, a running example, a quick check), key ideas, evidence-based practice tips, an assignment with guided fields and examples, a **Submit** button, Word export, and checked references. | `localStorage` (`rf.course`), with JSON backup/restore |
 | **Research Design Concierge** | Free, self-paced tool for designing your own study in 7 stages: problem → question → framework → design → people & measures → analysis & ethics → protocol. Includes the Evidence Library (citation verification), the Protocol editor with DOCX export, and mentor review. | IndexedDB projects, with JSON export/import |
 
-**Weeks:** 1 problem to question · 2 learning theory & conceptual frameworks · 3 research design · 4 assessment, measurement & validity · 5 analysis, ethics & proposal. Assignment answers can be copied into the Concierge with **Bring into Concierge**. This copy never overwrites a Concierge field you have already changed.
+**Weeks:** 1 research story & question (plus naming a mentor and starting CITI) · 2 literature search & evidence gap · 3 study design, measures & analysis · 4 mentor, logistics & dissemination · 5 protocol & IRB draft.
+
+**Live session:** Wednesdays 12:00–12:15 PM. Assignments are due Wednesday 8:00 AM; faculty review before noon and post written feedback by the afternoon. The schedule is in `SESSION` in `src/content/course.ts`. Assignment answers can be copied into the Concierge with **Bring into Concierge**. This copy never overwrites a Concierge field you have already changed.
 
 **Submitting an assignment** saves a dated final copy and downloads a Word file. If a faculty email is set in Settings, it also opens an email to them. There is no server-side gradebook.
 

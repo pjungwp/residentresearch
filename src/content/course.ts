@@ -58,6 +58,9 @@ export const READINGS: Record<string, Reading> = {
   pubmedHelp: { id: 'pubmedHelp', cite: 'National Library of Medicine. PubMed User Guide.', url: 'https://pubmed.ncbi.nlm.nih.gov/help/', why: 'MeSH, filters and search tips.' },
   ohrp: { id: 'ohrp', cite: 'HHS Office for Human Research Protections. Human research protection training (free).', url: 'https://www.hhs.gov/ohrp/education-and-outreach/human-research-protection-training/index.html', why: 'Free option if your IRB accepts it.' },
   icmje: { id: 'icmje', cite: 'International Committee of Medical Journal Editors. Recommendations (authorship criteria).', url: 'https://www.icmje.org/recommendations/', why: 'Who qualifies as an author.' },
+  eric: { id: 'eric', cite: 'Institute of Education Sciences. ERIC: Education Resources Information Center.', url: 'https://eric.ed.gov/', why: 'Education research database — search it alongside PubMed.' },
+  mededportal: { id: 'mededportal', cite: 'AAMC. MedEdPORTAL: The Journal of Teaching and Learning Resources.', url: 'https://www.mededportal.org/', why: 'Peer-reviewed teaching materials and curricula.' },
+  hipaaResearch: { id: 'hipaaResearch', cite: 'HHS Office for Civil Rights. Research (HIPAA Privacy Rule guidance).', url: 'https://www.hhs.gov/hipaa/for-professionals/special-topics/research/index.html', why: 'When an IRB can waive HIPAA authorization.' },
   citi: { id: 'citi', cite: 'CITI Program. Human subjects research training.', url: 'https://about.citiprogram.org/', why: 'Training most IRBs require.' }
 };
 
@@ -83,6 +86,8 @@ export interface AssignmentField {
   required?: boolean;
   /** fill-in-the-blank sentence frame (inserted on request) */
   starter?: string;
+  /** alternative starters chosen by another field's value (e.g. question type) */
+  starterBy?: { field: string; map: Record<string, string> };
   /** Concierge field to fill when transferring */
   concierge?: string;
 }
@@ -103,7 +108,8 @@ export interface CourseWeek {
   practice: { tip: string; cite: string }[];
   /** optional box for education-research projects */
   eduBox?: { title: string; points: string[]; cites: string[] };
-  assignment: { title: string; steps: string[]; output: string; minutes: number; fields: AssignmentField[] };
+  /** honest time estimate shown to residents, e.g. "30–45 min" */
+  assignment: { title: string; steps: string[]; output: string; time: string; fields: AssignmentField[] };
   readings: string[];
 }
 
@@ -136,13 +142,13 @@ export const COURSE: CourseWeek[] = [
         { text: 'Do patients like text messages?', why: 'Measures preference, not the outcome that matters.' }
       ] }
     ],
-    keyIdeas: ['Write the story first; the question comes out of it.', 'Name every PICOT (or PEO) element.', 'Choose an outcome you can actually get data for.', 'Keep 1–2 backup questions.'],
-    practice: [{ tip: 'Check FINER with a mentor before investing time.', cite: 'hulley' }, { tip: 'Glance at the literature now — 2 minutes can reshape your question (see Week 2).', cite: 'maggio' }],
+    keyIdeas: ['Write the story first; the question comes out of it.', 'Name every PICOT (or PEO) element.', 'Choose an outcome you can actually get data for.', 'Keep 1–2 backup questions.', 'Ask a mentor now and start CITI training — it takes a few hours and is needed before Week 5.'],
+    practice: [{ tip: 'Check FINER with a mentor before investing time.', cite: 'hulley' }, { tip: 'Start human subjects training now so it never holds up your IRB draft.', cite: 'citi' }, { tip: 'Glance at the literature now — 2 minutes can reshape your question (see Week 2).', cite: 'maggio' }],
     assignment: {
       title: 'Research story and question',
-      steps: ['Fill in the 5-line story.', 'Write one PICOT (or PEO) question.', 'Run a FINER check.'],
-      output: 'A 5-line story, one question, a FINER line.',
-      minutes: 30,
+      steps: ['Fill in the 5-line story.', 'Write one PICOT, PEO or SPIDER question.', 'Run a FINER check.', 'Name a mentor and start CITI training.'],
+      output: 'A 5-line story, one question, a FINER line, a mentor to ask.',
+      time: '30–45 min',
       fields: [
         { key: 'story.believed', label: 'Once upon a time, we believed…', kind: 'long', required: true, starter: 'Once upon a time, we believed that ', example: '…giving postpartum patients written BP instructions was enough.', concierge: 'story.believed' },
         { key: 'story.wondered', label: 'But I wondered whether…', kind: 'long', required: true, starter: 'But I wondered whether ', example: '…many never get their BP checked after discharge.', concierge: 'story.wondered' },
@@ -150,12 +156,14 @@ export const COURSE: CourseWeek[] = [
         { key: 'story.anticipate', label: 'I anticipate discovering…', kind: 'long', starter: 'I anticipate discovering that ', example: '…more patients get checked with reminders.', concierge: 'story.anticipate' },
         { key: 'story.change', label: 'And hopefully this will change…', kind: 'long', starter: 'And hopefully this will change ', example: '…our discharge workflow and reduce readmissions.', concierge: 'story.change' },
         { key: 'framework', label: 'Question type', kind: 'select', options: ['PICOT', 'PEO', 'SPIDER'], required: true, concierge: 'framework' },
-        { key: 'question', label: 'Research question', kind: 'long', required: true, hint: 'One sentence.', starter: 'In [population], does [intervention] compared with [comparison] change [outcome] within [time]?', example: 'In postpartum patients with hypertension, do text reminders compared with usual instructions increase BP checks within 10 days of discharge?', concierge: 'question' },
+        { key: 'question', label: 'Research question', kind: 'long', required: true, hint: 'One sentence. The starter follows the question type you chose.', starter: 'In [population], does [intervention] compared with [comparison] change [outcome] within [time]?', starterBy: { field: 'framework', map: { PEO: 'How do [population] experience [exposure], in terms of [outcome]?', SPIDER: 'What are the experiences of [sample] with [phenomenon of interest], explored through [design], in terms of [evaluation], using [research type: qualitative / mixed]?' } }, example: 'In postpartum patients with hypertension, do text reminders compared with usual instructions increase BP checks within 10 days of discharge?', concierge: 'question' },
         { key: 'finer', label: 'FINER check', kind: 'long', required: true, starter: 'F: \nI: \nN: \nE: \nR: ', example: 'F: EHR data, ~200 patients/yr · I: department priority · N: few local data · E: minimal risk · R: guidelines call for early postpartum BP checks' },
-        { key: 'backups', label: 'Backup question (optional)', kind: 'long', concierge: 'backups' }
+        { key: 'backups', label: 'Backup question (optional)', kind: 'long', concierge: 'backups' },
+        { key: 'mentorFirst', label: 'Mentor you’ll ask this week', kind: 'text', required: true, hint: 'Name someone even if you haven’t asked yet. You’ll confirm in Week 4.', example: 'Dr. Rivera (MFM) — studies postpartum hypertension' },
+        { key: 'citiStart', label: 'CITI training', kind: 'select', options: ['Started', 'Already completed (certificate current)', 'Not started yet'], required: true, hint: 'Ask your IRB which course. Finish before Week 4.' }
       ]
     },
-    readings: ['lingard', 'hulley', 'cookPurpose', 'bordageDawson']
+    readings: ['lingard', 'hulley', 'cookPurpose', 'bordageDawson', 'citi']
   },
   {
     n: 2, tone: 'w2', title: 'Literature search & evidence gap', short: 'Literature',
@@ -168,6 +176,11 @@ export const COURSE: CourseWeek[] = [
       { label: 'Verify every citation', text: 'AI tools can invent references. Confirm each one in PubMed or by DOI and read it yourself.' }
     ],
     theoryCites: ['maggio', 'grade', 'pubmedHelp'],
+    eduBox: {
+      title: 'If your study is about teaching or learning',
+      points: ['PubMed alone misses much education research. Also search ERIC.', 'Check MedEdPORTAL for published curricula and teaching tools you can build on or compare with.', 'Look for a review in Medical Education, Academic Medicine or Medical Teacher before designing from scratch.'],
+      cites: ['eric', 'mededportal', 'maggio']
+    },
     slides: [
       { kind: 'steps', title: 'From question to search', items: [{ label: 'Concepts', text: 'One per PICOT element' }, { label: 'Synonyms', text: 'Plus MeSH terms' }, { label: 'Combine', text: 'OR inside, AND between' }, { label: 'Log it', text: 'Date, database, hits' }] },
       { kind: 'table', title: 'Search string example', columns: ['Concept', 'Terms'], rows: [['Postpartum', 'postpartum OR puerperium OR Postpartum Period[mh]'], ['Hypertension', 'hypertension OR preeclampsia OR Hypertension, Pregnancy-Induced[mh]'], ['Reminders', 'text message* OR SMS OR Reminder Systems[mh]']], caption: 'PubMed User Guide' },
@@ -187,10 +200,10 @@ export const COURSE: CourseWeek[] = [
       title: 'Mini literature review',
       steps: ['Run one logged PubMed search.', 'Annotate 3–5 key sources.', 'State the gap and revise the question.'],
       output: 'Search string, 3–5 annotations, gap, revised question.',
-      minutes: 30,
+      time: '2–3 hours (the longest week)',
       fields: [
         { key: 'search', label: 'PubMed search string', kind: 'long', required: true, hint: 'Use the button below to run it.', starter: '(concept 1 terms) AND (concept 2 terms) AND (concept 3 terms)', example: '(postpartum OR puerperium) AND (hypertension OR preeclampsia) AND ("text message*" OR SMS)' },
-        { key: 'searchLog', label: 'Search log', kind: 'text', starter: 'Date: · Database: PubMed · Hits: · Kept: ', example: 'Oct 30 · PubMed · 84 hits · 5 kept' },
+        { key: 'searchLog', label: 'Search log', kind: 'text', hint: 'Education topic? Log an ERIC search too.', starter: 'Date: · Database: PubMed · Hits: · Kept: ', example: 'Oct 30 · PubMed · 84 hits · 5 kept' },
         { key: 'source1', label: 'Source 1', kind: 'long', required: true, starter: 'Citation + DOI/PMID: \nWhat they did: \nFound: \nLimitation: \nWhy it matters: ', example: 'Author, year (PMID) · RCT, n=… · texting increased BP checks · single center · supports our intervention' },
         { key: 'source2', label: 'Source 2', kind: 'long', required: true, starter: 'Citation + DOI/PMID: \nWhat they did: \nFound: \nLimitation: \nWhy it matters: ' },
         { key: 'source3', label: 'Source 3', kind: 'long', required: true, starter: 'Citation + DOI/PMID: \nWhat they did: \nFound: \nLimitation: \nWhy it matters: ' },
@@ -200,7 +213,7 @@ export const COURSE: CourseWeek[] = [
         { key: 'revisedQuestion', label: 'Revised question (or why it stays)', kind: 'long', required: true, concierge: 'revisedQuestion' }
       ]
     },
-    readings: ['maggio', 'grade', 'pubmedHelp', 'lingard']
+    readings: ['maggio', 'grade', 'pubmedHelp', 'lingard', 'eric', 'mededportal']
   },
   {
     n: 3, tone: 'w3', title: 'Study design, measures & analysis', short: 'Design',
@@ -224,7 +237,7 @@ export const COURSE: CourseWeek[] = [
       { kind: 'compare', title: 'Define the outcome exactly', left: { label: 'Vague', items: ['“BP follow-up”'] }, right: { label: 'Exact', items: ['Any documented BP reading 3–10 days after discharge, from the EHR'] } },
       { kind: 'table', title: 'Match analysis to outcome', columns: ['Outcome', 'Common analysis'], rows: [['Yes/no, two groups', 'Chi-square; risk difference'], ['Number, two groups', 't-test or Mann-Whitney'], ['Adjusting for confounders', 'Regression'], ['Interview text', 'Thematic analysis']], caption: 'Ask a biostatistician early' },
       { kind: 'cards', title: 'Surveys that work', items: [{ label: 'Use a validated one', text: 'If it exists, cite it' }, { label: 'Else: 7 steps', text: 'Review, interview, draft, expert review, pilot' }, { label: 'Likert data', text: 'Analyze thoughtfully' }], caption: 'Artino et al. 2014; Sullivan & Artino 2013' },
-      { kind: 'case', title: 'Running example', text: RUNNING_CASE, points: ['Design: pre/post with historical control', 'Outcome: documented BP 3–10 days', 'Analysis: risk difference + 95% CI, adjust for parity, race, insurance'] },
+      { kind: 'case', title: 'Running example', text: RUNNING_CASE, points: ['Design: pre/post with historical control', 'Outcome: documented BP 3–10 days', 'Analysis: risk difference + 95% CI, adjust for parity, race, insurance', 'Main bias: confounding by time — anything else that changed between periods (new staff, a new BP clinic) could explain the difference. Limit it by logging co-interventions and checking the trend before the change.'] },
       { kind: 'check', title: 'Quick check', question: 'Reminder group was also enrolled after a new BP clinic opened. The problem?', options: [
         { text: 'Chance', why: 'The issue is not sample size.' },
         { text: 'Confounding by time (co-intervention)', correct: true, why: 'The new clinic could explain the change.' },
@@ -237,7 +250,7 @@ export const COURSE: CourseWeek[] = [
       title: 'Design and analysis plan',
       steps: ['Choose a design and say why.', 'Define participants, intervention and exact outcome.', 'Match an analysis to the outcome.'],
       output: 'One page: design, people, outcome, analysis.',
-      minutes: 30,
+      time: '60–90 min',
       fields: [
         { key: 'design', label: 'Design', kind: 'select', required: true, options: ['Retrospective cohort / chart review', 'Case-control', 'Cross-sectional survey', 'Prospective observational', 'Pre–post / quality improvement', 'Randomized trial', 'Nonrandomized intervention', 'Educational pre–post', 'Qualitative (interviews / focus groups)', 'Mixed methods', 'Other'], concierge: 'design' },
         { key: 'rationale', label: 'Why this design', kind: 'long', required: true, starter: 'This design fits because … . A stronger design is not feasible because … .', concierge: 'rationale' },
@@ -247,7 +260,7 @@ export const COURSE: CourseWeek[] = [
         { key: 'dataSource', label: 'Data source / instrument', kind: 'text', required: true, example: 'EHR chart review; REDCap form', concierge: 'dataSource' },
         { key: 'analysis', label: 'Analysis plan', kind: 'long', required: true, starter: 'We will compare … using … and report … with 95% confidence intervals. We will adjust for … .', concierge: 'analysis' },
         { key: 'sampleSize', label: 'Sample size or feasibility', kind: 'long', starter: 'We expect … participants in … months, which is enough to … / a feasibility sample because … .', concierge: 'sampleSize' },
-        { key: 'bias', label: 'Main bias + how you’ll limit it', kind: 'long', concierge: 'bias' }
+        { key: 'bias', label: 'Main bias + how you’ll limit it', kind: 'long', starter: 'Main bias: … Limited by: …', example: 'Confounding by time (historical control). Limited by logging other changes during the study and comparing the pre-period trend.', concierge: 'bias' }
       ]
     },
     readings: ['grimes', 'hulley', 'sullivanFeinn', 'sullivanArtino', 'artino', 'strobe']
@@ -276,16 +289,16 @@ export const COURSE: CourseWeek[] = [
         { text: 'Abandon research entirely.', why: 'Too drastic; revise first.' }
       ] }
     ],
-    keyIdeas: ['Ask a mentor early, with a one-page plan.', 'Finish CITI/OHRP training now.', 'Build a timeline backward from graduation.', 'Pick a meeting deadline to aim for.'],
+    keyIdeas: ['Confirm your mentor with a one-page plan.', 'CITI/OHRP training should be finished this week.', 'Build a timeline backward from graduation.', 'Pick a meeting deadline to aim for.'],
     practice: [{ tip: 'Agree on authorship roles at the start.', cite: 'icmje' }, { tip: 'Meet your mentor briefly and regularly.', cite: 'sambunjak' }],
     assignment: {
       title: 'Feasibility and dissemination plan',
-      steps: ['Complete training and name a mentor.', 'Sketch logistics and a timeline.', 'Make a GO/REVISE/DEFER call and pick a venue.'],
+      steps: ['Finish CITI training and confirm your mentor.', 'Sketch logistics and a timeline.', 'Make a GO/REVISE/DEFER call and pick a venue.'],
       output: 'Training done, mentor, timeline, call, venue.',
-      minutes: 30,
+      time: '30–45 min (CITI already done)',
       fields: [
-        { key: 'training.course', label: 'Human subjects training', kind: 'text', required: true, starter: 'Course: … Completed on: …', example: 'CITI Biomedical Research — Basic, completed Nov 2', concierge: 'training.course' },
-        { key: 'mentor.name', label: 'Mentor (even if not asked yet)', kind: 'text', required: true, concierge: 'mentor.name' },
+        { key: 'training.course', label: 'Human subjects training (started Week 1)', kind: 'text', required: true, starter: 'Course: … Completed on: …', example: 'CITI Biomedical Research — Basic, completed Nov 2', concierge: 'training.course' },
+        { key: 'mentor.name', label: 'Mentor (confirmed?)', kind: 'text', required: true, starter: 'Name: … Agreed on: …', concierge: 'mentor.name' },
         { key: 'mentor.why', label: 'Why this mentor', kind: 'long', concierge: 'mentor.why' },
         { key: 'logistics', label: 'Data access, people, costs', kind: 'long', required: true, starter: 'Data: … People: … Costs: … (funded by …)', concierge: 'logistics.resources' },
         { key: 'timeline', label: 'Timeline', kind: 'long', required: true, starter: 'IRB: … · Data: … · Analysis: … · Abstract: … · Paper: …', concierge: 'timeline' },
@@ -303,17 +316,23 @@ export const COURSE: CourseWeek[] = [
     theory: [
       { label: 'Belmont, applied', text: 'Respect → consent. Beneficence → minimize risk. Justice → fair selection.' },
       { label: 'Your IRB decides the level', text: 'Exempt, expedited or full board — you propose, the IRB determines.' },
+      { label: 'Consent ≠ HIPAA', text: 'A chart review usually needs two separate requests: a waiver of informed consent and a HIPAA waiver of authorization.' },
       { label: 'Minimum necessary data', text: 'Collect only what you need; plan storage, access and destruction.' },
       { label: 'Write for the reader', text: 'Common rejection reasons: weak question, poor design, unclear methods. Fix them now.' }
     ],
-    theoryCites: ['belmont', 'commonRule', 'bordage2001'],
+    theoryCites: ['belmont', 'commonRule', 'hipaaResearch', 'bordage2001'],
+    eduBox: {
+      title: 'If your participants are residents or students',
+      points: ['Trainees can feel pressured to join a study run by people who evaluate them. Have someone outside their evaluation chain recruit and consent.', 'Keep who took part hidden from faculty who grade them, and say so in the consent.', 'Make clear that saying no has no effect on evaluations.', 'Student records (grades, evaluations) may be protected by FERPA — ask your IRB.'],
+      cites: ['belmont', 'commonRule']
+    },
     slides: [
       { kind: 'cards', title: 'Belmont principles', items: [{ label: 'Respect for persons', text: 'Informed, voluntary consent' }, { label: 'Beneficence', text: 'Benefits outweigh risks' }, { label: 'Justice', text: 'Fair burden and benefit' }], caption: 'The Belmont Report, 1979' },
       { kind: 'pyramid', title: 'Review levels', items: [{ label: 'Full board', text: 'More than minimal risk' }, { label: 'Expedited', text: 'Minimal risk, listed categories' }, { label: 'Exempt', text: 'Certain minimal-risk categories' }], caption: '45 CFR 46 — the IRB decides, not you' },
       { kind: 'cards', title: 'Protect data', items: [{ label: 'Minimum', text: 'Only needed fields' }, { label: 'Secure', text: 'Approved storage (e.g., REDCap)' }, { label: 'Code it', text: 'Key kept separately' }, { label: 'Destroy', text: 'Say when' }] },
       { kind: 'steps', title: 'Protocol outline', items: [{ label: 'Background & gap' }, { label: 'Question' }, { label: 'Methods' }, { label: 'Analysis' }, { label: 'Ethics & privacy' }, { label: 'Timeline' }] },
       { kind: 'cards', title: 'Avoid common rejections', items: [{ label: 'Unclear question' }, { label: 'Design can’t answer it' }, { label: 'Outcome not defined' }, { label: 'No analysis plan' }], caption: 'Bordage 2001' },
-      { kind: 'case', title: 'Running example', text: RUNNING_CASE, points: ['Likely expedited or exempt — IRB decides', 'Waiver of consent requested for chart review', 'Data in REDCap, coded, destroyed after 5 years'] },
+      { kind: 'case', title: 'Running example', text: RUNNING_CASE, points: ['Likely expedited or exempt — IRB decides', 'Requests both a waiver of consent and a HIPAA waiver of authorization', 'Data in REDCap, coded, destroyed after 5 years'] },
       { kind: 'check', title: 'Quick check', question: 'Who decides if your study is exempt?', options: [
         { text: 'You, the investigator', why: 'Investigators propose; they don’t decide.' },
         { text: 'Your mentor', why: 'Mentors advise; the IRB determines.' },
@@ -326,17 +345,18 @@ export const COURSE: CourseWeek[] = [
       title: 'Protocol and IRB draft',
       steps: ['Fill the ethics fields.', 'List what is missing.', 'Export the full protocol.'],
       output: 'Exportable protocol draft (Weeks 1–5).',
-      minutes: 30,
+      time: '45–60 min',
       fields: [
         { key: 'reviewCategory', label: 'Likely review level (IRB decides)', kind: 'text', required: true, starter: 'Likely … because … ; for IRB determination.', concierge: 'reviewCategory' },
         { key: 'risksBenefits', label: 'Risks & benefits', kind: 'long', required: true, starter: 'Risks: … Minimized by: … Benefits: …', concierge: 'risksBenefits' },
-        { key: 'consent', label: 'Consent approach', kind: 'long', required: true, starter: 'We will obtain … consent / request a waiver because … .', concierge: 'consent' },
+        { key: 'consent', label: 'Consent & HIPAA authorization', kind: 'long', required: true, starter: 'Consent: we will obtain … consent / request a waiver because … .\nHIPAA: we will obtain authorization / request a waiver of authorization because … .', example: 'Consent: waiver requested — retrospective chart review, minimal risk, impracticable to contact. HIPAA: waiver of authorization requested on the same grounds; only the minimum necessary fields.', concierge: 'consent' },
+        { key: 'voluntariness', label: 'If participants are trainees: protecting their choice', kind: 'long', hint: 'Skip if your participants are patients only.', starter: 'Recruited and consented by: … (not their evaluators). Faculty will not know who took part because … . Declining has no effect on evaluations.' },
         { key: 'privacy', label: 'Privacy & data plan', kind: 'long', required: true, starter: 'Data collected: … Stored in: … Access: … Destroyed: …', concierge: 'privacy' },
         { key: 'outstanding', label: 'Still missing', kind: 'long', required: true, starter: 'Forms: … Approvals: … Decisions: …', concierge: 'outstanding' },
         { key: 'decision', label: 'Continue as capstone?', kind: 'select', options: ['Go — make it my capstone', 'Revise first', 'No — not this project'], required: true, concierge: 'decision' }
       ]
     },
-    readings: ['belmont', 'commonRule', 'citi', 'bordage2001', 'equator', 'strobe', 'srqr']
+    readings: ['belmont', 'commonRule', 'hipaaResearch', 'citi', 'bordage2001', 'equator', 'strobe', 'srqr']
   }
 ];
 
@@ -347,3 +367,37 @@ export const COURSE_DESIGN = [
   { label: 'Small chunks', text: 'One idea per slide to limit load.', cite: 'sweller' },
   { label: 'Feedback loops', text: 'Weekly submissions with faculty feedback.', cite: 'hattie' }
 ];
+
+/** How the live Wednesday session runs (shown on the Academy home). */
+export const SESSION = {
+  when: 'Wednesdays, 12:00–12:15 PM, for five weeks',
+  due: 'Assignments due Wednesday, 8:00 AM. Faculty review them before noon; written feedback is posted by Wednesday afternoon.',
+  agenda: [
+    { time: '12:00', text: 'Three residents give 1-minute progress updates (rotating, so everyone presents at least once).' },
+    { time: '12:03', text: 'Faculty feedback and group discussion.' },
+    { time: '12:10', text: 'Preview of next week’s assignment.' },
+    { time: '12:13', text: 'Asian Snack Mystery Lottery — everyone who takes part draws one.' }
+  ],
+  notes: [
+    'Most weeks take 30–60 minutes. Week 2 takes longer, and CITI training (a few hours, once) should be started in Week 1.',
+    'Assignments are formative and can be revised. Post-call or on nights? Join remotely or submit late without penalty.',
+    'No patient information in assignments or updates.'
+  ]
+};
+
+/** Any starter text for a field, given the week's current answers. */
+export function starterFor(f: AssignmentField, values: Record<string, string>): string | undefined {
+  if (f.starterBy) {
+    const alt = f.starterBy.map[values[f.starterBy.field] ?? ''];
+    if (alt) return alt;
+  }
+  return f.starter;
+}
+
+/** True when the value is empty or only an unedited starter (any variant). */
+export function isBlankAnswer(f: AssignmentField, value: string): boolean {
+  const v = value.trim();
+  if (!v) return true;
+  const starters = [f.starter, ...Object.values(f.starterBy?.map ?? {})].filter(Boolean).map((x) => x!.trim());
+  return starters.includes(v);
+}

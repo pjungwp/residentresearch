@@ -3,7 +3,7 @@
  * (localStorage key `rf.course`), so the course and the Concierge never overwrite each other.
  */
 import { useSyncExternalStore } from 'react';
-import { COURSE } from '@/content/course';
+import { COURSE, isBlankAnswer } from '@/content/course';
 import { createProject, persist, setField, getProjectCached } from './store';
 
 export type AssignmentStatus = 'not_started' | 'in_progress' | 'submitted';
@@ -95,7 +95,7 @@ export function assignmentStatus(s: CourseState, n: number): AssignmentStatus {
 export function missingRequired(s: CourseState, n: number): string[] {
   const def = COURSE[n - 1];
   const w = work(s, n);
-  return def.assignment.fields.filter((f) => f.required && (!(w.values[f.key] ?? '').trim() || (w.values[f.key] ?? '').trim() === (f.starter ?? '').trim())).map((f) => f.label);
+  return def.assignment.fields.filter((f) => f.required && isBlankAnswer(f, w.values[f.key] ?? '')).map((f) => f.label);
 }
 
 export function submit(n: number) {

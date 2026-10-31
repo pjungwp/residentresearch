@@ -4,7 +4,7 @@ import {
   ArrowLeft, ArrowRight, CheckCircle2, Circle, Compass, Download, ExternalLink, GraduationCap, Lightbulb, Mail, Maximize2, Pencil, Send, Sparkles, X, BookOpen, Upload, Loader2, AlertTriangle
 } from 'lucide-react';
 import { SimpleShell } from '@/components/shell';
-import { COURSE, COURSE_DESIGN, READINGS, RUNNING_CASE, RUNNING_NAME, type CourseWeek, type Slide, type AssignmentField } from '@/content/course';
+import { COURSE, COURSE_DESIGN, READINGS, RUNNING_CASE, RUNNING_NAME, SESSION, starterFor, isBlankAnswer, type CourseWeek, type Slide, type AssignmentField } from '@/content/course';
 import { TONE_CLASSES } from '@/content/fields';
 import {
   useCourse, work, setValue, assignmentStatus, missingRequired, submit, reopen, assignmentText, bringToConcierge, updateCourse, exportCourseJson, importCourseJson, type CourseState
@@ -89,9 +89,24 @@ export function AcademyHome() {
           <li className="rounded-[20px] border-2 border-dashed border-line-strong p-5">
             <span className="text-[1rem] font-bold uppercase tracking-[0.08em] text-slate">Running example</span>
             <p className="mt-1 font-display text-[1.375rem] font-semibold leading-tight">{RUNNING_NAME}</p>
-            <p className="mt-2 text-[1.0625rem]">{RUNNING_CASE.split(': ')[1]}. It grows each week.</p>
+            <p className="mt-2 text-[1.0625rem]">{(() => { const q = RUNNING_CASE.split(': ')[1]; return q.charAt(0).toUpperCase() + q.slice(1); })()} It grows each week.</p>
           </li>
         </ol>
+
+        <section className="mt-10" aria-labelledby="session-h">
+          <h2 id="session-h" className="text-[1.625rem]">How Wednesdays work</h2>
+          <p className="mt-1 text-[1.125rem]"><strong>{SESSION.when}.</strong> {SESSION.due}</p>
+          <div className="mt-3 grid gap-4 lg:grid-cols-2">
+            <ol className="card divide-y divide-line p-0">
+              {SESSION.agenda.map((a) => (
+                <li key={a.time} className="flex gap-4 px-4 py-3 text-[1.0625rem]"><span className="w-14 shrink-0 font-semibold tabular-nums text-teal">{a.time}</span><span>{a.text}</span></li>
+              ))}
+            </ol>
+            <ul className="space-y-2">
+              {SESSION.notes.map((x) => <li key={x} className="card p-4 text-[1.0625rem]">{x}</li>)}
+            </ul>
+          </div>
+        </section>
 
         <section className="mt-10" aria-labelledby="design-h">
           <h2 id="design-h" className="text-[1.625rem]">How this course is built</h2>
@@ -524,15 +539,15 @@ function AssignmentPanel({ week, course }: { week: CourseWeek; course: CourseSta
       </ol>
       <p className="mt-3 text-[1.125rem]"><strong>You’ll hand in:</strong> {week.assignment.output}</p>
       <ul className="mt-2 flex flex-wrap gap-2 text-[1rem] font-semibold" aria-label="Logistics">
-        <li className="rounded-full bg-surface px-3 py-1">Due Wednesday morning</li>
-        <li className="rounded-full bg-surface px-3 py-1">About {week.assignment.minutes} min</li>
+        <li className="rounded-full bg-surface px-3 py-1">Due Wednesday 8:00 AM</li>
+        <li className="rounded-full bg-surface px-3 py-1">About {week.assignment.time}</li>
         <li className="rounded-full bg-surface px-3 py-1">Formative · feedback by Wednesday afternoon</li>
       </ul>
       <p className="mt-2 text-[1rem] text-slate">Tip: tap <strong>Use starter</strong> to drop in a fill-in-the-blank sentence.</p>
 
       <div className="mt-5 grid gap-4 md:grid-cols-2">
         {week.assignment.fields.map((f) => (
-          <AssignmentInput key={f.key} n={n} f={f} value={w.values[f.key] ?? ''} locked={locked} wide={f.kind === 'long'} />
+          <AssignmentInput key={f.key} n={n} f={f} value={w.values[f.key] ?? ''} starter={starterFor(f, w.values)} locked={locked} wide={f.kind === 'long'} />
         ))}
       </div>
 
@@ -584,7 +599,7 @@ function AssignmentPanel({ week, course }: { week: CourseWeek; course: CourseSta
   );
 }
 
-function AssignmentInput({ n, f, value, locked, wide }: { n: number; f: AssignmentField; value: string; locked: boolean; wide: boolean }) {
+function AssignmentInput({ n, f, value, starter, locked, wide }: { n: number; f: AssignmentField; value: string; starter?: string; locked: boolean; wide: boolean }) {
   const [ex, setEx] = useState(false);
   const id = `a${n}-${f.key}`;
   return (
@@ -601,8 +616,8 @@ function AssignmentInput({ n, f, value, locked, wide }: { n: number; f: Assignme
       </div>
       {f.hint && <span className="field-hint">{f.hint}</span>}
       {ex && f.example && <p className="mt-1 rounded-xl bg-surface-2 px-3 py-2 text-[1rem] italic">{f.example}</p>}
-      {f.starter && !locked && !value.trim() && (
-        <button type="button" className="mt-1.5 inline-flex min-h-[40px] items-center gap-1.5 rounded-full border border-line-strong bg-surface px-3 text-[0.9375rem] font-semibold text-teal hover:bg-sage" onClick={() => setValue(n, f.key, f.starter!)}>
+      {starter && !locked && (!value.trim() || (isBlankAnswer(f, value) && value.trim() !== starter.trim())) && (
+        <button type="button" className="mt-1.5 inline-flex min-h-[40px] items-center gap-1.5 rounded-full border border-line-strong bg-surface px-3 text-[0.9375rem] font-semibold text-teal hover:bg-sage" onClick={() => setValue(n, f.key, starter)}>
           <Pencil size={15} aria-hidden /> Use starter
         </button>
       )}
