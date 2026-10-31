@@ -11,6 +11,7 @@ import { downloadFile, formatDate } from '@/lib/format';
 import { usePageTitle } from '@/lib/usePageTitle';
 import { useToast } from '@/components/ui/Toast';
 import { Segmented } from '@/components/ui/primitives';
+import { SKINS } from 'app-skins';
 import { slug } from './evidence';
 import type { Project } from '@/lib/types';
 
@@ -249,6 +250,7 @@ export function SettingsPage() {
             </label>
           )}
           <Segmented name="theme" label="Appearance" value={s.theme} onChange={(v) => setSettings({ theme: v })} options={[{ value: 'system', label: 'System' }, { value: 'light', label: 'Light' }, { value: 'dark', label: 'Dark' }]} />
+          <LookPicker value={s.skin} />
         </section>
 
         <section className="card space-y-3 p-4">
@@ -339,5 +341,36 @@ export function AboutPage() {
         <Link to="/projects" className="btn btn-primary">Go to my projects</Link>
       </div>
     </SimpleShell>
+  );
+}
+
+/** "Look": optional shared skins (app-skins). Saved per device with the other settings; App default keeps the Appearance choice above. */
+function LookPicker({ value }: { value: string }) {
+  const looks = [{ id: '', name: 'App default', blurb: 'ResearchForge’s own colours (follows Appearance)', swatch: ['#FFF9F3', '#FBE4DA', '#A6503C'] }, ...SKINS];
+  return (
+    <fieldset className="min-w-0">
+      <legend className="mb-1 text-[1rem] font-semibold">Look</legend>
+      <p className="mb-2 text-[0.9375rem] text-slate">Optional skins shared with your other apps. A skin replaces Appearance while it is on. Saved on this device only.</p>
+      <div className="grid grid-cols-2 gap-2 min-[560px]:grid-cols-4">
+        {looks.map((l) => {
+          const on = (value || '') === l.id;
+          return (
+            <button
+              key={l.id || 'default'}
+              type="button"
+              aria-pressed={on}
+              title={l.blurb}
+              onClick={() => setSettings({ skin: l.id })}
+              className={`min-w-0 rounded-[var(--radius-control)] border bg-surface p-2 text-left ${on ? 'border-teal ring-2 ring-teal' : 'border-line-strong hover:border-teal'}`}
+            >
+              <span className="flex h-6 overflow-hidden rounded-md border border-line" aria-hidden>
+                {l.swatch.map((c, i) => <span key={i} className="flex-1" style={{ background: c }} />)}
+              </span>
+              <span className="mt-1 block truncate text-[0.9375rem] font-semibold">{l.name}</span>
+            </button>
+          );
+        })}
+      </div>
+    </fieldset>
   );
 }

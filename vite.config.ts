@@ -29,7 +29,16 @@ export default defineConfig({
         globPatterns: ['**/*.{js,css,html,svg,png}', '**/inter-latin-*.woff2'],
         navigateFallback: '/index.html',
         navigateFallbackDenylist: [/^\/api\//],
-        maximumFileSizeToCacheInBytes: 4 * 1024 * 1024
+        maximumFileSizeToCacheInBytes: 4 * 1024 * 1024,
+        // app-skins art and fonts load only when a Look is chosen: keep them out of the precache, cache on first use
+        globIgnores: ['**/*-wide-*', '**/*-tall-*', '**/elegant-*', '**/editorial-*', '**/playful-*', '**/pop-*', '**/cormorant-*', '**/playfair-*', '**/fredoka-*', '**/anton-*'],
+        runtimeCaching: [
+          {
+            urlPattern: ({ url }) => url.pathname.startsWith('/assets/') && /\.(webp|woff2)$/.test(url.pathname),
+            handler: 'CacheFirst',
+            options: { cacheName: 'skin-assets', expiration: { maxEntries: 80, maxAgeSeconds: 60 * 60 * 24 * 365 } }
+          }
+        ]
       }
     })
   ],

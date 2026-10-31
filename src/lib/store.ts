@@ -362,6 +362,8 @@ export interface Settings {
   railExpanded: boolean;
   blueprintWidth: number;
   theme: 'system' | 'light' | 'dark';
+  /** optional shared skin from app-skins ('' = the app's own look); overrides theme while set */
+  skin: string;
   lastProjectId: string;
   /** reading size: 100% / 112.5% / 125% / 137.5% */
   textSize: 'md' | 'lg' | 'xl' | 'xxl';
@@ -369,7 +371,7 @@ export interface Settings {
   facultyEmail: string;
   learnerName: string;
 }
-const DEFAULT_SETTINGS: Settings = { accessCode: '', email: '', aiNoticeAccepted: false, role: 'resident', mentorName: '', railExpanded: false, blueprintWidth: 360, theme: 'system', lastProjectId: '', textSize: 'lg', facultyEmail: '', learnerName: '' };
+const DEFAULT_SETTINGS: Settings = { accessCode: '', email: '', aiNoticeAccepted: false, role: 'resident', mentorName: '', railExpanded: false, blueprintWidth: 360, theme: 'system', skin: '', lastProjectId: '', textSize: 'lg', facultyEmail: '', learnerName: '' };
 export function getSettings(): Settings {
   return { ...DEFAULT_SETTINGS, ...safe.get<Partial<Settings>>(SETTINGS_KEY, {}) };
 }

@@ -213,3 +213,56 @@
   .md pre { background: var(--sage); padding: 8px 10px; border-radius: 8px; overflow-x: auto; white-space: pre-wrap; }
   .md a { word-break: break-word; }
 }
+
+/* ================= app-skins adapter =================
+   Only active while a shared Look is chosen in Settings (<html data-skin="…">).
+   Maps the app's tokens onto the pack's --sk-* variables; with no skin nothing here applies. */
+:root[data-skin] {
+  --ink: var(--sk-ink); --slate: var(--sk-sub); --slate-ui: var(--sk-faint);
+  --teal: var(--sk-accent-text); --teal-strong: var(--sk-accent-text); --teal-soft: var(--sk-accent-soft);
+  --btn-primary: var(--sk-accent); --btn-primary-hover: var(--sk-accent-2);
+  --ivory: var(--sk-bg); --page: var(--sk-bg); --surface: var(--sk-surface); --surface-2: var(--sk-surface-2);
+  --sage: var(--sk-surface-2); --lavender: var(--sk-accent-soft);
+  --ok: var(--sk-ok); --ok-soft: var(--sk-ok-bg); --err: var(--sk-err); --err-soft: var(--sk-err-bg); --warn: var(--sk-warn); --warn-soft: var(--sk-warn-bg);
+  --terra: var(--sk-accent-text); --terra-soft: var(--sk-accent-soft);
+  --line: var(--sk-line); --line-strong: color-mix(in srgb, var(--sk-line) 70%, var(--sk-ink));
+  --header-bg: linear-gradient(120deg, var(--sk-hdr-1), var(--sk-hdr-2));
+  --coral: var(--sk-accent-2); --shadow: var(--sk-shadow);
+  --radius-card: var(--sk-radius); --radius-control: var(--sk-radius-sm);
+  --w1-soft: color-mix(in srgb, var(--w1) var(--sk-tint-mix), var(--sk-surface)); --w1-text: color-mix(in srgb, var(--w1) 40%, var(--sk-ink));
+  --w2-soft: color-mix(in srgb, var(--w2) var(--sk-tint-mix), var(--sk-surface)); --w2-text: color-mix(in srgb, var(--w2) 40%, var(--sk-ink));
+  --w3-soft: color-mix(in srgb, var(--w3) var(--sk-tint-mix), var(--sk-surface)); --w3-text: color-mix(in srgb, var(--w3) 40%, var(--sk-ink));
+  --w4-soft: color-mix(in srgb, var(--w4) var(--sk-tint-mix), var(--sk-surface)); --w4-text: color-mix(in srgb, var(--w4) 40%, var(--sk-ink));
+  --w5-soft: color-mix(in srgb, var(--w5) var(--sk-tint-mix), var(--sk-surface)); --w5-text: color-mix(in srgb, var(--w5) 40%, var(--sk-ink));
+  --w6-soft: color-mix(in srgb, var(--w6) var(--sk-tint-mix), var(--sk-surface)); --w6-text: color-mix(in srgb, var(--w6) 40%, var(--sk-ink));
+  --w7-soft: color-mix(in srgb, var(--w7) var(--sk-tint-mix), var(--sk-surface)); --w7-text: color-mix(in srgb, var(--w7) 40%, var(--sk-ink));
+}
+/* cards, panels and sheets: skin surface, radius, shadow and frosting */
+:root[data-skin] :is(.card, .chip, .input, .btn-secondary, .btn-danger, .bg-surface) { -webkit-backdrop-filter: var(--sk-blur); backdrop-filter: var(--sk-blur); }
+:root[data-skin] :is(.rounded-\[24px\], .rounded-\[20px\]) { border-radius: var(--sk-radius); }
+/* text on accent fills (the default look hard-codes white) */
+:root[data-skin] :is(.btn-primary, .btn-primary:hover, .skip-link, .bg-primary, .\!bg-primary, .chip[aria-pressed='true'], .chip[aria-current='page']) { color: var(--sk-on-accent) !important; }
+/* the font-display utility follows the skin's heading font */
+:root[data-skin] .font-display { font-family: var(--sk-display); }
+/* page content sits on a panel so no text is drawn straight onto the background art */
+:root[data-skin] main#main:not(.min-w-0) > div:first-child {
+  background: var(--sk-surface); border: 1px solid var(--sk-line); border-radius: var(--sk-radius); box-shadow: var(--sk-shadow);
+  -webkit-backdrop-filter: var(--sk-blur); backdrop-filter: var(--sk-blur);
+  width: calc(100% - 16px); margin-top: 12px; margin-bottom: 16px;
+}
+@media (min-width: 900px) { :root[data-skin] main#main:not(.min-w-0) > div:first-child { margin-top: 24px; margin-bottom: 28px; } }
+:root[data-skin] main#main.min-w-0 { background: color-mix(in srgb, var(--sk-bg) 55%, transparent); -webkit-backdrop-filter: var(--sk-blur); backdrop-filter: var(--sk-blur); }
+:root[data-skin] main#main ~ footer { background: var(--sk-surface); -webkit-backdrop-filter: var(--sk-blur); backdrop-filter: var(--sk-blur); }
+/* header bar: skin gradient with its own text colour (menus inside it keep the normal panel colours) */
+:root[data-skin] header.sticky { border-color: color-mix(in srgb, var(--sk-hdr-ink) 18%, transparent); color: var(--sk-hdr-ink); -webkit-backdrop-filter: var(--sk-blur); backdrop-filter: var(--sk-blur); }
+:root[data-skin] header.sticky > div:not([role]) {
+  --ink: var(--sk-hdr-ink); --slate: color-mix(in srgb, var(--sk-hdr-ink) 78%, transparent); --teal: var(--sk-hdr-ink);
+  --teal-soft: color-mix(in srgb, var(--sk-hdr-ink) 16%, transparent); --sage: color-mix(in srgb, var(--sk-hdr-ink) 12%, transparent);
+  --surface: color-mix(in srgb, var(--sk-hdr-ink) 10%, transparent); --line: color-mix(in srgb, var(--sk-hdr-ink) 18%, transparent); --line-strong: color-mix(in srgb, var(--sk-hdr-ink) 35%, transparent);
+}
+:root[data-skin] header.sticky [role='menu'] {
+  --ink: var(--sk-ink); --slate: var(--sk-sub); --teal: var(--sk-accent-text); --teal-soft: var(--sk-accent-soft); --sage: var(--sk-surface-2);
+  --surface: var(--sk-surface); --line: var(--sk-line); color: var(--sk-ink);
+}
+/* side panels, drawers and full-screen views painted with the page colour: make them opaque skin panels */
+:root[data-skin] .bg-page { background: linear-gradient(var(--sk-surface), var(--sk-surface)), var(--sk-bg); }

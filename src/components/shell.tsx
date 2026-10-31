@@ -5,6 +5,7 @@ import {
   X, Check, Loader2, AlertTriangle, WifiOff, Info, ClipboardList, MoreHorizontal, ChevronDown, FolderOpen, Search, Plus, GraduationCap, Compass, Layers
 } from 'lucide-react';
 import { useRegisterSW } from 'virtual:pwa-register/react';
+import { applySkin, isSkin } from 'app-skins';
 import type { Project } from '@/lib/types';
 import { createProject, fv, setSettings, useProject, useProjects, useSettings } from '@/lib/store';
 import { LiveBlueprint } from './blueprint';
@@ -144,14 +145,28 @@ export function UpdatePrompt() {
   );
 }
 
+/** Applies the theme preference — or a shared app-skins Look, which overrides it — to <html>. */
+export function applyLook(theme: string, skin: string) {
+  const el = document.documentElement;
+  if (isSkin(skin)) {
+    el.dataset.theme = 'light'; // the skin adapter is written over the light tokens
+    applySkin(skin);
+    return;
+  }
+  if (el.dataset.skin) {
+    applySkin(null);
+    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', '#FFF9F3');
+  }
+  if (theme === 'system') delete el.dataset.theme;
+  else el.dataset.theme = theme;
+}
+
 /** Applies the theme preference to <html>. */
 export function ThemeSync() {
-  const { theme, textSize } = useSettings();
+  const { theme, textSize, skin } = useSettings();
   useEffect(() => {
-    const el = document.documentElement;
-    if (theme === 'system') delete el.dataset.theme;
-    else el.dataset.theme = theme;
-  }, [theme]);
+    applyLook(theme, skin);
+  }, [theme, skin]);
   useEffect(() => {
     document.documentElement.style.setProperty('--ui-scale', SIZES.find((x) => x.id === textSize)?.scale ?? '112.5%');
   }, [textSize]);

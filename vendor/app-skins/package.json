@@ -1,0 +1,38 @@
+{
+  "name": "app-skins",
+  "version": "1.0.0",
+  "description": "Shared, selectable skins (colours, fonts, background art) for Dr. Lin's web apps.",
+  "type": "module",
+  "main": "index.js",
+  "types": "index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./index.d.ts",
+      "default": "./index.js"
+    },
+    "./skins.css": "./skins.css",
+    "./tokens.json": "./tokens.json",
+    "./art/*": "./art/*"
+  },
+  "files": [
+    "index.js",
+    "index.d.ts",
+    "skins.data.mjs",
+    "skins.css",
+    "tokens.json",
+    "art",
+    "static"
+  ],
+  "sideEffects": [
+    "*.css"
+  ],
+  "dependencies": {
+    "@fontsource/anton": "^5.1.0",
+    "@fontsource/cormorant-garamond": "^5.1.0",
+    "@fontsource/fredoka": "^5.1.0",
+    "@fontsource/playfair-display": "^5.1.0"
+  },
+  "scripts": {
+    "build": "node scripts/build.mjs && node scripts/static.mjs && python3 scripts/pack.py"
+  }
+}
