@@ -371,9 +371,14 @@ export interface Settings {
   facultyEmail: string;
   learnerName: string;
 }
-const DEFAULT_SETTINGS: Settings = { accessCode: '', email: '', aiNoticeAccepted: false, role: 'resident', mentorName: '', railExpanded: false, blueprintWidth: 360, theme: 'system', skin: '', lastProjectId: '', textSize: 'lg', facultyEmail: '', learnerName: '' };
+/** Course director — every submitted assignment is emailed here unless a resident sets another address. */
+export const DEFAULT_FACULTY_EMAIL = 'wlin@holyname.org';
+const DEFAULT_SETTINGS: Settings = { accessCode: '', email: '', aiNoticeAccepted: false, role: 'resident', mentorName: '', railExpanded: false, blueprintWidth: 360, theme: 'system', skin: '', lastProjectId: '', textSize: 'lg', facultyEmail: DEFAULT_FACULTY_EMAIL, learnerName: '' };
 export function getSettings(): Settings {
-  return { ...DEFAULT_SETTINGS, ...safe.get<Partial<Settings>>(SETTINGS_KEY, {}) };
+  const merged = { ...DEFAULT_SETTINGS, ...safe.get<Partial<Settings>>(SETTINGS_KEY, {}) };
+  // A blank saved value (from older versions) falls back to the course director.
+  if (!merged.facultyEmail?.trim()) merged.facultyEmail = DEFAULT_FACULTY_EMAIL;
+  return merged;
 }
 const settingsListeners = new Set<() => void>();
 let settingsSnap = getSettings();

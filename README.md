@@ -11,7 +11,7 @@ Two separate experiences that share one look and feel:
 
 **Live session:** Wednesdays 12:00–12:15 PM. Assignments are due Wednesday 8:00 AM; faculty review before noon and post written feedback by the afternoon. The schedule is in `SESSION` in `src/content/course.ts`. Assignment answers can be copied into the Concierge with **Bring into Concierge**. This copy never overwrites a Concierge field you have already changed.
 
-**Submitting an assignment** saves a dated final copy and downloads a Word file. If a faculty email is set in Settings, it also opens an email to them. There is no server-side gradebook.
+**Submitting an assignment** saves a dated final copy and downloads a Word file. It then opens an email addressed to Dr. Lin (wlin@holyname.org) by default, or to the faculty email set in Settings; the resident attaches the Word file and sends. There is no server-side gradebook.
 
 **AI is optional everywhere.** Lessons, assignments, Concierge stages, citation checks and exports all work without it. Every AI button is labeled *uses paid API credits*, because each request is billed to the program's Anthropic account.
 

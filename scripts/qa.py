@@ -98,13 +98,22 @@ async def main():
         await page.select_option("#a1-framework", "PICOT")
         await page.fill("#a1-question", "In postpartum patients with hypertension, do text reminders increase OSCE-free BP checks within 10 days vs usual care?")
         await page.fill("#a1-finer", "F: yes I: yes N: yes E: yes R: yes")
+        await page.fill("#a1-mentorFirst", "Dr. Rivera (MFM)")
+        await page.select_option("#a1-citiStart", "Started")
+        cdp = await page.context.new_cdp_session(page)
+        await cdp.send("Page.enable")
+        mailtos = []
+        cdp.on("Page.frameRequestedNavigation", lambda e: mailtos.append(e.get("url", "")) if e.get("url", "").startswith("mailto:") else None)
         await submit_btn.click()
         async with page.expect_download() as dl:
             await page.get_by_role("button", name="Yes, submit").click()
         d = await dl.value
         await d.save_as(str(OUT / "week1.docx"))
         await page.wait_for_selector("text=Edit & resubmit")
-        if not await page.get_by_role("link", name="Add faculty email").count(): problems.append("[academy] missing faculty email prompt")
+        await page.wait_for_timeout(500)
+        if not any(m.startswith("mailto:wlin@holyname.org?") for m in mailtos): problems.append(f"[academy] submit did not open email to wlin@holyname.org: {mailtos}")
+        else: print("submit opened:", mailtos[0][:120])
+        if not await page.get_by_role("button", name=re.compile("wlin@holyname.org")).count(): problems.append("[academy] submit email not addressed to wlin@holyname.org")
         await page.screenshot(path=str(OUT / "1440_submitted.png"))
         # AI feedback (mocked, optional, paid credits)
         await page.get_by_role("button", name="Get AI feedback").click()

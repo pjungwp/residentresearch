@@ -285,8 +285,8 @@ export function SettingsPage() {
           </label>
           <label className="block">
             <span className="field-label">Faculty email</span>
-            <span className="field-hint">Submitted assignments open an email to this address.</span>
-            <input className="input mt-1" type="email" value={s.facultyEmail} onChange={(e) => setSettings({ facultyEmail: e.target.value })} placeholder="faculty@hospital.org" />
+            <span className="field-hint">Submitted assignments open an email to this address. Leave blank to send to Dr. Lin (wlin@holyname.org).</span>
+            <input className="input mt-1" type="email" value={s.facultyEmail} onChange={(e) => setSettings({ facultyEmail: e.target.value })} placeholder="wlin@holyname.org" />
           </label>
         </section>
 

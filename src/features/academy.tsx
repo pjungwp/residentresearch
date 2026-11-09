@@ -9,7 +9,7 @@ import { TONE_CLASSES } from '@/content/fields';
 import {
   useCourse, work, setValue, assignmentStatus, missingRequired, submit, reopen, assignmentText, bringToConcierge, updateCourse, exportCourseJson, importCourseJson, type CourseState
 } from '@/lib/courseStore';
-import { setSettings, useSettings } from '@/lib/store';
+import { DEFAULT_FACULTY_EMAIL, setSettings, useSettings } from '@/lib/store';
 import { askConcierge, AIError, phiWarnings } from '@/lib/ai';
 import { downloadFile } from '@/lib/format';
 import { usePageTitle } from '@/lib/usePageTitle';
@@ -487,23 +487,30 @@ function AssignmentPanel({ week, course }: { week: CourseWeek; course: CourseSta
   const [busy, setBusy] = useState(false);
   const missing = missingRequired(course, n);
 
+  const openEmail = (values: Record<string, string>, submittedAt: string | number) => {
+    const to = settings.facultyEmail.trim() || DEFAULT_FACULTY_EMAIL;
+    const who = settings.learnerName ? ` — ${settings.learnerName}` : '';
+    const body = `${assignmentText(course, n, values)}\n\n— Submitted ${new Date(submittedAt).toLocaleString()} from ResearchForge${settings.learnerName ? ` by ${settings.learnerName}` : ''}. Please attach the Word file that just downloaded.`;
+    const url = `mailto:${to}?subject=${encodeURIComponent(`ResearchForge Week ${n}: ${week.assignment.title}${who}`)}&body=${encodeURIComponent(body.slice(0, 1800))}`;
+    window.location.href = url;
+  };
+
   const doSubmit = async () => {
+    const values = { ...w.values };
+    const at = Date.now();
     submit(n);
     setConfirm(false);
-    toast('Assignment submitted');
+    toast('Assignment submitted — opening an email to your faculty');
     try {
       const { exportAssignment } = await import('@/lib/courseDocx');
       await exportAssignment(n);
     } catch {
       /* download is a convenience; submission is already saved */
     }
+    openEmail(values, at);
   };
 
-  const mailto = () => {
-    const body = `${assignmentText(course, n, w.submitted ?? w.values)}\n\n— Submitted ${new Date(w.submittedAt ?? Date.now()).toLocaleString()} from ResearchForge${settings.learnerName ? ` by ${settings.learnerName}` : ''}. The Word file is attached.`;
-    const url = `mailto:${encodeURIComponent(settings.facultyEmail)}?subject=${encodeURIComponent(`ResearchForge Week ${n}: ${week.assignment.title}${settings.learnerName ? ` — ${settings.learnerName}` : ''}`)}&body=${encodeURIComponent(body.slice(0, 1800))}`;
-    window.location.href = url;
-  };
+  const mailto = () => openEmail(w.submitted ?? w.values, w.submittedAt ?? Date.now());
 
   const transfer = async () => {
     setBusy(true);
@@ -558,18 +565,14 @@ function AssignmentPanel({ week, course }: { week: CourseWeek; course: CourseSta
         {locked ? (
           <div className="flex flex-wrap items-center gap-2">
             <p className="flex w-full items-center gap-2 text-[1.125rem] font-semibold text-ok"><CheckCircle2 size={22} aria-hidden /> Submitted{w.submissions > 1 ? ` (version ${w.submissions})` : ''}</p>
-            {settings.facultyEmail ? (
-              <button className="btn btn-primary" onClick={mailto}><Mail size={20} aria-hidden /> Email to faculty</button>
-            ) : (
-              <Link to="/settings" className="btn btn-secondary">Add faculty email</Link>
-            )}
+            <button className="btn btn-primary" onClick={mailto}><Mail size={20} aria-hidden /> Email again to {settings.facultyEmail}</button>
             <button className="btn btn-secondary" onClick={async () => (await import('@/lib/courseDocx')).exportAssignment(n)}><Download size={20} aria-hidden /> Word file</button>
             <button className="btn btn-ghost" onClick={() => reopen(n)}><Pencil size={18} aria-hidden /> Edit & resubmit</button>
           </div>
         ) : confirm ? (
           <div>
             <p className="text-[1.125rem] font-semibold">Submit Week {n}?</p>
-            <p className="mt-1 text-[1rem] text-slate">We save a dated final copy and download a Word file. Then email it to your faculty. ResearchForge has no gradebook.</p>
+            <p className="mt-1 text-[1rem] text-slate">We save a dated final copy, download a Word file, and open an email to {settings.facultyEmail}. Attach the Word file and press send. ResearchForge has no gradebook.</p>
             <div className="mt-3 flex flex-wrap gap-2">
               <button className="btn btn-primary" onClick={doSubmit}><Send size={20} aria-hidden /> Yes, submit</button>
               <button className="btn btn-ghost" onClick={() => setConfirm(false)}>Cancel</button>
