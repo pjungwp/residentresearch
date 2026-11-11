@@ -172,8 +172,8 @@ export const COURSE: CourseWeek[] = [
     theory: [
       { label: 'Search is a method', text: 'Turn each PICOT element into a concept, list synonyms and MeSH terms, combine with OR inside and AND between.' },
       { label: 'Not all evidence is equal', text: 'Guidelines and systematic reviews first; then trials and cohorts. GRADE rates how certain the evidence is.' },
-      { label: 'Read to find the gap', text: 'A gap is what the best evidence still can’t answer — for your population, setting or outcome.' },
-      { label: 'Verify every citation', text: 'AI tools can invent references. Confirm each one in PubMed or by DOI and read it yourself.' }
+      { label: 'Read to find the gap', text: 'A gap is what the best evidence still can’t answer — for your population, setting or outcome. Explain how specific findings change or support your research question.' },
+      { label: 'AI assists; researchers verify', text: 'AI can quickly compile a preliminary literature scan but cannot replace a manual database search in serious research. Independently verify every citation and the findings attributed to it in PubMed, Crossref, a journal site, or another publicly searchable scholarly record. A fabricated or untraceable citation earns no completion credit for Week 2. Full text need not be free.' }
     ],
     theoryCites: ['maggio', 'grade', 'pubmedHelp'],
     eduBox: {
@@ -186,7 +186,7 @@ export const COURSE: CourseWeek[] = [
       { kind: 'table', title: 'Search string example', columns: ['Concept', 'Terms'], rows: [['Postpartum', 'postpartum OR puerperium OR Postpartum Period[mh]'], ['Hypertension', 'hypertension OR preeclampsia OR Hypertension, Pregnancy-Induced[mh]'], ['Reminders', 'text message* OR SMS OR Reminder Systems[mh]']], caption: 'PubMed User Guide' },
       { kind: 'pyramid', title: 'Where to look first', items: [{ label: 'Guidelines', text: 'ACOG, USPSTF' }, { label: 'Systematic reviews', text: 'Cochrane' }, { label: 'Trials & cohorts', text: 'Primary studies' }, { label: 'Opinion & case reports', text: 'Least certain' }], caption: 'Certainty rated with GRADE (Guyatt et al. 2008)' },
       { kind: 'cards', title: 'Annotate each source', items: [{ label: 'What they did', text: 'Design, sample' }, { label: 'What they found', text: 'One line' }, { label: 'Limitation', text: 'Always one' }, { label: 'Why it matters', text: 'For your question' }] },
-      { kind: 'compare', title: 'Gap → better question', left: { label: 'Before', items: ['Do reminders help postpartum BP follow-up?'] }, right: { label: 'After reading (hypothetical)', items: ['Say most trials used home BP cuffs, not texts alone.', 'New focus: texts alone, in our clinic.'] } },
+      { kind: 'compare', title: 'Evidence → justified revision', left: { label: 'Before', items: ['Do reminders help postpartum BP follow-up?'] }, right: { label: 'After reading (hypothetical)', items: ['Finding: most trials combined home BP cuffs with reminders.', 'Change: study texts alone at our clinic.', 'Explain why this gap matters and cite the source.'] } },
       { kind: 'case', title: 'Running example', text: RUNNING_CASE, points: ['4 key sources: 1 guideline, 1 review, 2 trials', 'Gap: texts alone, safety-net population', 'Question narrowed to our clinic'] },
       { kind: 'check', title: 'Quick check', question: 'An AI tool gives you a perfect-looking reference. What next?', options: [
         { text: 'Cite it — the formatting is correct.', why: 'Formatting proves nothing; references can be invented.' },
@@ -194,23 +194,26 @@ export const COURSE: CourseWeek[] = [
         { text: 'Ask the AI if it is real.', why: 'The same tool can confidently confirm a fake.' }
       ] }
     ],
-    keyIdeas: ['Search systematically and keep a log.', 'Start with guidelines and reviews.', 'Annotate: what, found, limitation, relevance.', 'Let the gap reshape your question.'],
+    keyIdeas: ['Use AI for a quick preliminary scan, not as a substitute for a manual scholarly search.', 'Verify each citation and its claimed findings in a publicly searchable scholarly record; fabricated or untraceable citations mean no completion credit.', 'Search systematically and keep a log.', 'Annotate: what, found, limitation, relevance.', 'Explain what changed, why, and how specific literature findings justify your research question; evidence may also justify retaining it.'],
     practice: [{ tip: 'Build the literature review to argue a gap, not to list papers.', cite: 'maggio' }, { tip: 'Ask a medical librarian — it’s free and fast.', cite: 'pubmedHelp' }],
     assignment: {
       title: 'Mini literature review',
-      steps: ['Run one logged PubMed search.', 'Annotate 3–5 key sources.', 'State the gap and revise the question.'],
-      output: 'Search string, 3–5 annotations, gap, revised question.',
+      steps: ['Run one manual, logged PubMed search (or another appropriate scholarly database). AI can help scan quickly but cannot replace manual searching for serious research.', 'Annotate 3–5 relevant sources, independently verifying each citation and the claims drawn from it in a publicly searchable scholarly record (PMID, DOI, journal page, or equivalent). If any citation is fabricated or cannot be independently located, the submission receives no completion credit until corrected. Free full text is not required.', 'State the evidence gap and show your original and revised research questions.', 'In 100–150 words, explain what changed, why, and how specific findings or limitations from the literature support your revision. If unchanged, justify keeping the question with evidence; cosmetic rewording is insufficient.'],
+      output: 'Logged manual search; 3–5 verified annotations; evidence gap; original and revised questions; 100–150-word evidence-grounded explanation.',
       time: '2–3 hours (the longest week)',
       fields: [
         { key: 'search', label: 'PubMed search string', kind: 'long', required: true, hint: 'Use the button below to run it.', starter: '(concept 1 terms) AND (concept 2 terms) AND (concept 3 terms)', example: '(postpartum OR puerperium) AND (hypertension OR preeclampsia) AND ("text message*" OR SMS)' },
-        { key: 'searchLog', label: 'Search log', kind: 'text', hint: 'Education topic? Log an ERIC search too.', starter: 'Date: · Database: PubMed · Hits: · Kept: ', example: 'Oct 30 · PubMed · 84 hits · 5 kept' },
+        { key: 'searchLog', label: 'Manual search log', kind: 'text', required: true, hint: 'Record database, date, hits, and kept sources. Education topic? Include ERIC when appropriate. AI-only searches do not meet this requirement.', starter: 'Date: · Database: PubMed · Hits: · Kept: ', example: 'Oct 30 · PubMed · 84 hits · 5 kept' },
         { key: 'source1', label: 'Source 1', kind: 'long', required: true, starter: 'Citation + DOI/PMID: \nWhat they did: \nFound: \nLimitation: \nWhy it matters: ', example: 'Author, year (PMID) · RCT, n=… · texting increased BP checks · single center · supports our intervention' },
         { key: 'source2', label: 'Source 2', kind: 'long', required: true, starter: 'Citation + DOI/PMID: \nWhat they did: \nFound: \nLimitation: \nWhy it matters: ' },
         { key: 'source3', label: 'Source 3', kind: 'long', required: true, starter: 'Citation + DOI/PMID: \nWhat they did: \nFound: \nLimitation: \nWhy it matters: ' },
         { key: 'source4', label: 'Source 4 (optional)', kind: 'long', starter: 'Citation + DOI/PMID: \nWhat they did: \nFound: \nLimitation: \nWhy it matters: ' },
         { key: 'source5', label: 'Source 5 (optional)', kind: 'long', starter: 'Citation + DOI/PMID: \nWhat they did: \nFound: \nLimitation: \nWhy it matters: ' },
         { key: 'gap', label: 'Evidence gap', kind: 'long', required: true, starter: 'We know that … but we do not know whether … in … .', concierge: 'gap' },
-        { key: 'revisedQuestion', label: 'Revised question (or why it stays)', kind: 'long', required: true, concierge: 'revisedQuestion' }
+        { key: 'originalQuestion', label: 'Original Week 1 research question', kind: 'long', required: true, hint: 'Copy the original question so the change is visible.' },
+        { key: 'revisedQuestion', label: 'Revised research question', kind: 'long', required: true, hint: 'Make a substantive literature-informed refinement, or retain the question if evidence supports it.', concierge: 'revisedQuestion' },
+        { key: 'revisionRationale', label: 'Why and how did you revise it? (100–150 words)', kind: 'long', required: true, hint: 'Explain WHAT changed (or stayed), WHY, and HOW specific literature findings, limitations, and gaps informed your decision. Cite source numbers or authors. A wording-only change is insufficient.', starter: 'What changed (or stayed): \nSpecific literature evidence (cite sources): \nHow this strengthens the question: ' },
+        { key: 'citationVerification', label: 'Citation verification (required)', kind: 'long', required: true, hint: 'For each source, give a publicly searchable PMID, DOI, or journal/database URL. Confirm the article exists and supports your summary. A fabricated or untraceable citation results in no completion credit until corrected; a paywall alone does not disqualify a source.', starter: 'Source 1: PMID/DOI/URL — verified in: \nSource 2: PMID/DOI/URL — verified in: \nSource 3: PMID/DOI/URL — verified in: ' }
       ]
     },
     readings: ['maggio', 'grade', 'pubmedHelp', 'lingard', 'eric', 'mededportal']
